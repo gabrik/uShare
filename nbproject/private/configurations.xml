@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="97">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="po">
+      </df>
+      <df name="scripts">
+      </df>
+      <df name="src">
+        <in>buffer.c</in>
+        <in>buffer.h</in>
+        <in>cds.c</in>
+        <in>cds.h</in>
+        <in>cfgparser.c</in>
+        <in>cfgparser.h</in>
+        <in>cms.c</in>
+        <in>cms.h</in>
+        <in>content.c</in>
+        <in>content.h</in>
+        <in>ctrl_telnet.c</in>
+        <in>ctrl_telnet.h</in>
+        <in>gettext.h</in>
+        <in>http.c</in>
+        <in>http.h</in>
+        <in>metadata.c</in>
+        <in>metadata.h</in>
+        <in>mime.c</in>
+        <in>mime.h</in>
+        <in>minmax.h</in>
+        <in>msr.c</in>
+        <in>msr.h</in>
+        <in>osdep.c</in>
+        <in>osdep.h</in>
+        <in>presentation.c</in>
+        <in>presentation.h</in>
+        <in>redblack.c</in>
+        <in>redblack.h</in>
+        <in>rest_callback.h</in>
+        <in>services.c</in>
+        <in>services.h</in>
+        <in>trace.c</in>
+        <in>trace.h</in>
+        <in>ushare.c</in>
+        <in>ushare.h</in>
+        <in>util_iconv.c</in>
+        <in>util_iconv.h</in>
+      </df>
+      <in>config.h</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_signals>
+        </gdb_signals>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -c /home/gabriele/Immagini</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -d -c /home/gabriele/Immagini </runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -d -c /home/gabriele/Immagini</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Immagini</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v </runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>

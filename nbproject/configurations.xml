@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="97">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="src">
+        <in>buffer.c</in>
+        <in>cds.c</in>
+        <in>cfgparser.c</in>
+        <in>cms.c</in>
+        <in>content.c</in>
+        <in>ctrl_telnet.c</in>
+        <in>http.c</in>
+        <in>metadata.c</in>
+        <in>mime.c</in>
+        <in>msr.c</in>
+        <in>osdep.c</in>
+        <in>presentation.c</in>
+        <in>redblack.c</in>
+        <in>rest_callback.h</in>
+        <in>services.c</in>
+        <in>trace.c</in>
+        <in>ushare.c</in>
+        <in>util_iconv.c</in>
+      </df>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+      <itemPath>configure</itemPath>
+      <itemPath>nbproject/private/launcher.properties</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath>src/ushare</executablePath>
+          <cTool>
+            <incDir>
+              <pElem>.</pElem>
+              <pElem>/usr/include/upnp</pElem>
+              <pElem>/usr/include/x86_64-linux-gnu</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>HAVE_DEBUG</Elem>
+              <Elem>HAVE_DLNA</Elem>
+              <Elem>HAVE_ICONV</Elem>
+              <Elem>HAVE_IFADDRS_H</Elem>
+              <Elem>HAVE_LANGINFO_CODESET</Elem>
+              <Elem>HAVE_LANGINFO_H</Elem>
+              <Elem>HAVE_LOCALE_H</Elem>
+              <Elem>HAVE_SETLOCALE</Elem>
+              <Elem>_FILE_OFFSET_BITS=64</Elem>
+              <Elem>_GNU_SOURCE</Elem>
+              <Elem>_LARGEFILE_SOURCE</Elem>
+              <Elem>_REENTRANT</Elem>
+            </preprocessorList>
+          </cTool>
+        </makeTool>
+        <preBuild>
+          <preBuildCommandWorkingDir>.</preBuildCommandWorkingDir>
+          <preBuildCommand>./configure CC=${IDE_CC} CXX=${IDE_CXX} CFLAGS="-g3 -gdwarf-2" CXXFLAGS="-g3 -gdwarf-2"</preBuildCommand>
+        </preBuild>
+      </makefileType>
+      <item path="src/buffer.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cds.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cfgparser.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/cms.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/content.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/ctrl_telnet.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/http.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/metadata.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/mime.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/msr.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/osdep.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/presentation.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/redblack.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/rest_callback.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/services.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/trace.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/ushare.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/util_iconv.c" ex="false" tool="0" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

@@ -163,8 +163,7 @@ convert_xml (const char *title)
 static struct mime_type_t Container_MIME_Type =
   { NULL, "object.container.storageFolder", NULL};
 
-static struct upnp_entry_t *
-upnp_entry_new (struct ushare_t *ut, const char *name, const char *fullpath,
+static struct upnp_entry_t *upnp_entry_new (struct ushare_t *ut, const char *name, const char *fullpath,
                 struct upnp_entry_t *parent, off_t size, int dir)
 {
   struct upnp_entry_t *entry = NULL;
@@ -182,7 +181,7 @@ upnp_entry_new (struct ushare_t *ut, const char *name, const char *fullpath,
   entry->url = NULL;
   if (ut->dlna_enabled && fullpath && !dir)
   {
-    dlna_profile_t *p = dlna_guess_media_profile (ut->dlna, fullpath);
+    dlna_profile_t *p = dlna_guess_media_profile (ut->dlna, fullpath );//TODO genera SIGSEV se non è un file video
     if (!p)
     {
       free (entry);

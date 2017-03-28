@@ -91,6 +91,7 @@ http_get_info (const char *filename, struct File_Info *info)
     return -1;
 
   log_verbose ("http_get_info, filename : %s\n", filename);
+  printf ("http_get_info, filename : %s\n", filename);
 
   if (!strcmp (filename, CDS_LOCATION))
   {
@@ -209,7 +210,7 @@ http_open (const char *filename, enum UpnpOpenFileMode mode)
     return NULL;
 
   log_verbose ("http_open, filename : %s\n", filename);
-
+  printf ("http_open, filename : %s\n", filename);
   if (mode != UPNP_READ)
     return NULL;
 
@@ -236,6 +237,7 @@ http_open (const char *filename, enum UpnpOpenFileMode mode)
     return NULL;
 
   log_verbose ("Fullpath : %s\n", entry->fullpath);
+  printf ("Fullpath : %s\n", entry->fullpath);
 
   fd = open (entry->fullpath, O_RDONLY | O_NONBLOCK | O_SYNC | O_NDELAY);
   if (fd < 0)
@@ -258,6 +260,7 @@ http_read (UpnpWebFileHandle fh, char *buf, size_t buflen)
   ssize_t len = -1;
 
   log_verbose ("http_read\n");
+  printf ("http_read\n");
 
   if (!file)
     return -1;
@@ -266,10 +269,12 @@ http_read (UpnpWebFileHandle fh, char *buf, size_t buflen)
   {
   case FILE_LOCAL:
     log_verbose ("Read local file.\n");
+    printf ("Read local file.\n");
     len = read (file->detail.local.fd, buf, buflen);
     break;
   case FILE_MEMORY:
     log_verbose ("Read file from memory.\n");
+    printf ("Read file from memory.\n");
     len = (size_t) MIN (buflen, file->detail.memory.len - file->pos);
     memcpy (buf, file->detail.memory.contents + file->pos, (size_t) len);
     break;
@@ -282,6 +287,7 @@ http_read (UpnpWebFileHandle fh, char *buf, size_t buflen)
     file->pos += len;
 
   log_verbose ("Read %zd bytes.\n", len);
+  printf ("Read %zd bytes.\n", len);
 
   return len;
 }
@@ -292,6 +298,7 @@ http_write (UpnpWebFileHandle fh __attribute__((unused)),
             size_t buflen __attribute__((unused)))
 {
   log_verbose ("http write\n");
+  printf ("http write\n");
 
   return 0;
 }
@@ -312,6 +319,7 @@ http_seek (UpnpWebFileHandle fh, off_t offset, int origin)
   case SEEK_SET:
     log_verbose ("Attempting to seek to %lld (was at %lld) in %s\n",
                 offset, file->pos, file->fullpath);
+    
     newpos = offset;
     break;
   case SEEK_CUR:
@@ -361,6 +369,7 @@ http_seek (UpnpWebFileHandle fh, off_t offset, int origin)
     if (newpos < 0 || newpos > file->detail.memory.len)
     {
       log_verbose ("%s: cannot seek: %s\n", file->fullpath, strerror (EINVAL));
+      printf ("%s: cannot seek: %s\n", file->fullpath, strerror (EINVAL));
       return -1;
     }
     break;

@@ -313,7 +313,7 @@ parse_config_file (struct ushare_t *ut)
 inline static void
 display_usage (void)
 {
-  display_headers ();
+  //display_headers ();
   printf ("\n");
   printf (_("Usage: ushare [-n name] [-i interface] [-p port] [-c directory] [[-c directory]...]\n"));
   printf (_("Options:\n"));
@@ -384,7 +384,7 @@ parse_command_line (struct ushare_t *ut, int argc, char **argv)
       return -1;
 
     case 'V':
-      display_headers ();
+      //display_headers ();
       return -1;
 
     case 'v':
