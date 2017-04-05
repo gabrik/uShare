@@ -1,0 +1,27 @@
+cds.o: cds.c ushare.h content.h buffer.h redblack.h services.h metadata.h \
+ http.h mime.h minmax.h
+cms.o: cms.c ushare.h content.h buffer.h redblack.h services.h mime.h
+msr.o: msr.c ushare.h content.h buffer.h redblack.h services.h
+http.o: http.c services.h ushare.h content.h buffer.h redblack.h cds.h \
+ cms.h msr.h metadata.h http.h minmax.h trace.h presentation.h osdep.h \
+ mime.h
+presentation.o: presentation.c ../config.h metadata.h ushare.h content.h \
+ buffer.h redblack.h http.h presentation.h gettext.h util_iconv.h
+metadata.o: metadata.c mime.h metadata.h ushare.h content.h buffer.h \
+ redblack.h http.h util_iconv.h gettext.h trace.h
+mime.o: mime.c mime.h ushare.h content.h buffer.h redblack.h
+services.o: services.c ushare.h content.h buffer.h redblack.h services.h \
+ cms.h cds.h msr.h trace.h
+buffer.o: buffer.c buffer.h minmax.h
+util_iconv.o: util_iconv.c util_iconv.h
+content.o: content.c content.h
+cfgparser.o: cfgparser.c ../config.h gettext.h cfgparser.h ushare.h \
+ content.h buffer.h redblack.h trace.h osdep.h
+trace.o: trace.c ../config.h trace.h ushare.h content.h buffer.h \
+ redblack.h
+redblack.o: redblack.c redblack.h
+osdep.o: osdep.c osdep.h
+ctrl_telnet.o: ctrl_telnet.c ../config.h ctrl_telnet.h minmax.h trace.h
+ushare.o: ushare.c rest_callback.h live.h ushare.h content.h buffer.h \
+ redblack.h ../config.h services.h http.h metadata.h util_iconv.h \
+ cfgparser.h gettext.h trace.h ctrl_telnet.h

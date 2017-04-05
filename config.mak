@@ -10,7 +10,7 @@ CC=gcc
 LN=ln
 STRIP=echo ignoring strip
 INSTALLSTRIP=
-EXTRALIBS= -lixml -lthreadutil -lpthread -lupnp -pthread -ldlna -lavformat -lavcodec -lavformat-ffmpeg -lavcodec-ffmpeg -lulfius
+EXTRALIBS= -lixml -lthreadutil -lpthread -lupnp -pthread -ldlna -lavformat -lavcodec -lavformat-ffmpeg -lavcodec-ffmpeg -lulfius -ljansson -lyder -lorcania -lcurl
 OPTFLAGS= -I.. -W -Wall -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -D_GNU_SOURCE -g3 -DHAVE_DEBUG -DHAVE_LOCALE_H -DHAVE_SETLOCALE -DHAVE_IFADDRS_H -DHAVE_LANGINFO_H -DHAVE_LANGINFO_CODESET -DHAVE_ICONV -pthread -I/usr/include/upnp -DHAVE_DLNA -I/usr/include/x86_64-linux-gnu
 LDFLAGS=
 INSTALL=/usr/bin/install -c

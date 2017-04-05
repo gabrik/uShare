@@ -59,8 +59,7 @@ static struct service_t services[] = {
   { NULL, NULL, NULL }
 };
 
-bool
-find_service_action (struct Upnp_Action_Request *request,
+bool find_service_action (struct Upnp_Action_Request *request,
                      struct service_t **service,
                      struct service_action_t **action)
 {
@@ -90,8 +89,7 @@ find_service_action (struct Upnp_Action_Request *request,
   return false;
 }
 
-bool
-upnp_add_response (struct action_event_t *event, char *key, const char *value)
+bool upnp_add_response (struct action_event_t *event, char *key, const char *value)
 {
   char *val;
   int res;
@@ -117,8 +115,7 @@ upnp_add_response (struct action_event_t *event, char *key, const char *value)
   return true;
 }
 
-char *
-upnp_get_string (struct Upnp_Action_Request *request, const char *key)
+char * upnp_get_string (struct Upnp_Action_Request *request, const char *key)
 {
   IXML_Node *node = NULL;
 
@@ -154,8 +151,7 @@ upnp_get_string (struct Upnp_Action_Request *request, const char *key)
   return NULL;
 }
 
-int
-upnp_get_ui4 (struct Upnp_Action_Request *request, const char *key)
+int upnp_get_ui4 (struct Upnp_Action_Request *request, const char *key)
 {
   char *value;
   int val;

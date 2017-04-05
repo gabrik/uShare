@@ -81,8 +81,7 @@
 /* Represent the CMS Success Status. */
 #define SERVICE_CMS_STATUS_OK "OK"
 
-static bool
-cms_get_protocol_info (struct action_event_t *event)
+static bool cms_get_protocol_info (struct action_event_t *event)
 {
   extern struct mime_type_t MIME_Type_List[];
   struct mime_type_t *list;
@@ -128,8 +127,7 @@ cms_get_protocol_info (struct action_event_t *event)
   return event->status;
 }
 
-static bool
-cms_get_current_connection_ids (struct action_event_t *event)
+static bool cms_get_current_connection_ids (struct action_event_t *event)
 {
   if (!event)
     return false;
@@ -139,8 +137,7 @@ cms_get_current_connection_ids (struct action_event_t *event)
   return event->status;
 }
 
-static bool
-cms_get_current_connection_info (struct action_event_t *event)
+static bool cms_get_current_connection_info (struct action_event_t *event)
 {
   extern struct mime_type_t MIME_Type_List[];
   struct mime_type_t *list = MIME_Type_List;

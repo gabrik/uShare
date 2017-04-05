@@ -26,6 +26,8 @@
 #include <upnp/upnptools.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <strings.h>
+#include <stdio.h>
 
 #ifdef HAVE_DLNA
 #include <dlna.h>
@@ -129,4 +131,27 @@ struct action_event_t {
 
 inline void display_headers (void);
 
+
+
+
+typedef struct live_transcoding{
+    int fd;
+    int id;
+} live_transcoding_t;
+
+
+live_transcoding_t* live_objects;
+size_t live_number;
+int cmpfunc(const void *a, const void *b);
+
+
+
+
+
+
+
+
+void add_source(char* src);
 #endif /* _USHARE_H_ */
+
+

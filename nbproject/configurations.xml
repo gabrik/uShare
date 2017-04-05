@@ -16,7 +16,6 @@
         <in>osdep.c</in>
         <in>presentation.c</in>
         <in>redblack.c</in>
-        <in>rest_callback.h</in>
         <in>services.c</in>
         <in>trace.c</in>
         <in>ushare.c</in>
@@ -104,8 +103,6 @@
       <item path="src/presentation.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/redblack.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/rest_callback.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/services.c" ex="false" tool="0" flavor2="0">
       </item>

@@ -22,6 +22,7 @@
         <in>gettext.h</in>
         <in>http.c</in>
         <in>http.h</in>
+        <in>live.h</in>
         <in>metadata.c</in>
         <in>metadata.h</in>
         <in>mime.c</in>
@@ -91,10 +92,12 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}" -d -c /home/gabriele/Immagini </runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -d -c /home/gabriele/Immagini</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Immagini</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v </runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v</runcommand>
+        <runcommand>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommand>
         <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>

@@ -79,6 +79,8 @@
 #include "buffer.h"
 #include "ctrl_telnet.h"
 
+#include "content.h"
+
 struct ushare_t *ut = NULL;
 
 static struct ushare_t * ushare_new(void)
@@ -177,6 +179,10 @@ static void ushare_signal_exit(void) {
     ulfius_stop_framework(&server_inst);
     ulfius_clean_instance(&server_inst);
     
+    printf("Server is shutting down: other clients will be notified soon, Bye bye ...\n");
+    
+    ushare_free(&ut);
+    
     exit(EXIT_SUCCESS);
     
     
@@ -212,6 +218,7 @@ static void handle_action_request(struct Upnp_Action_Request *request) {
         //log_verbose ("CtrlPtIP: %s\n", val);
         log_verbose("Action Request:\n%s\n", str);
         
+        /*
         printf("***************************************************\n");
         printf("**             New Action Request                **\n");
         printf("***************************************************\n");
@@ -219,6 +226,7 @@ static void handle_action_request(struct Upnp_Action_Request *request) {
         printf("ActionName: %s\n", request->ActionName);
         //log_verbose ("CtrlPtIP: %s\n", val);
         printf("Action Request:\n%s\n", str);
+         */
         
         ixmlFreeDOMString(str);
     }
@@ -790,7 +798,10 @@ int main(int argc, char **argv) {
         display_headers();
     }
 
-    
+    // inizializzo live objects
+    live_objects = NULL;
+    live_number=(size_t)0;
+
     
     
     //rest server
@@ -800,6 +811,14 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     ulfius_add_endpoint_by_val(&server_inst,"GET","test",NULL,NULL,NULL,NULL,&callback_test,NULL);
+    ulfius_add_endpoint_by_val(&server_inst,"GET","add","/source/:ip",NULL,NULL,NULL,&callback_add_source,NULL);
+    
+    /*url_format:        string used to define the endpoint format
+     *                    separate words with /
+     *                    to define a variable in the url, prefix it with @ or :
+     *                    example: /test/resource/:name/elements
+     *                    on an url_format that ends with '*', the rest of the url will not be tested
+     */
     
     if(ulfius_start_framework(&server_inst)==U_OK)
         printf("[ULFIUS] REST Server started on port %d\n",server_inst.port);
@@ -836,10 +855,16 @@ int main(int argc, char **argv) {
     // pthread_cond_wait (&ut->termination_cond, &ut->termination_mutex);
     // pthread_mutex_unlock (&ut->termination_mutex);
 
+    
+    
+    
+    free_metadata_list(ut);
+    build_metadata_list(ut);
+    
     while (true) {
         log_info(_("Rescanning...\n"));
-        free_metadata_list(ut);
-        build_metadata_list(ut);
+        //free_metadata_list(ut);
+        //build_metadata_list(ut);
         sleep(30);
     }
 
@@ -852,4 +877,30 @@ int main(int argc, char **argv) {
 
     /* it should never be executed */
     return EXIT_SUCCESS;
+}
+
+
+void add_source(char* src){
+    printf("Adding live source %s\n",src);
+    
+    char *protocol="http://";
+    char* uri=calloc(strlen(src)+strlen(protocol),sizeof(char));
+    strcpy(uri,protocol);
+    strcat(uri,src);
+    printf("Source uri is %s\n",uri);
+    ut->contentlist = content_add(ut->contentlist,uri);
+    
+    free_metadata_list(ut);
+    build_metadata_list(ut);
+}
+
+
+int cmpfunc(const void *a, const void *b)
+{
+    live_transcoding_t* one = (live_transcoding_t*)a;
+    live_transcoding_t* two = (live_transcoding_t*)b;
+    /*if(one->id == two->id)
+        return one;
+    */
+   return ( one->id - two->id );
 }
