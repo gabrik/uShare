@@ -276,7 +276,8 @@ http_open(const char *filename, enum UpnpOpenFileMode mode) {
             FILE *fp;
             //int rfd;
             //-analyzeduration 10000000
-            char *base="ffmpeg -threads 4 -analyzeduration 10 -f mpegts -i %s -y -threads 4 -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -sn -b 20000k -f vob pipe:";
+            //-b 20000k
+            char *base="ffmpeg -threads auto -analyzeduration 10 -f mpegts -i %s -y -threads auto -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -sn -f vob pipe:";
             char *cmd = calloc(strlen(base)+strlen(entry->fullpath), sizeof (char));
             printf("Source is: %s\n", entry->fullpath);
             sprintf(cmd, base, entry->fullpath);
@@ -337,7 +338,7 @@ http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
     if (!file)
         return -1;
 
-    if(isLiveMedia(file->fullpath)){
+    /*if(isLiveMedia(file->fullpath)){
         printf("This is a live media\n");
         live_transcoding_t obj;// = calloc(1,sizeof(live_transcoding_t));
         obj.id=file->detail.local.entry->id;    
@@ -351,7 +352,7 @@ http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
         }
         log_verbose("Read %zd bytes.\n", len);
         return len;
-    }
+    }*/
     
 
     switch (file->type) {
@@ -363,6 +364,14 @@ http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
             log_verbose("Read file from memory.\n");
             len = (size_t) MIN(buflen, file->detail.memory.len - file->pos);
             memcpy(buf, file->detail.memory.contents + file->pos, (size_t) len);
+            break;
+        case FILE_LIVE: // CASE FOR LIVE VIDEO
+            log_verbose("Read live file.\n");
+            live_transcoding_t obj;
+            obj.id=file->detail.local.entry->id;    
+            live_transcoding_t* f = (live_transcoding_t*) bsearch ((void*)&obj, (void *)live_objects,live_number , sizeof (live_transcoding_t), cmpfunc);
+            
+            len = read(f->fd, buf, buflen);
             break;
         default:
             log_verbose("Unknown file type.\n");
