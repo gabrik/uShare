@@ -78,33 +78,33 @@ extern "C" {
         add_source(media_src);
         
         
-        
-         //FILE *fp;
-         int fd;
-            //int rfd;
-            //-analyzeduration 10000000
-            char *base="ffmpeg -threads 4 -analyzeduration 10 -f mpegts -i http://%s -y -threads 4 -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -sn -b 20000k -f vob pipe:";
-            char *cmd = calloc(strlen(base)+strlen(media_src), sizeof (char));
-            printf("Source is: %s\n", media_src);
-            sprintf(cmd, base, media_src);
-        
-        
-            printf("Command is: %s\n", cmd);
-            fp = popen(cmd, "r");
-        
-            if (!fp<0) {
-                return NULL;
-            }
-            fd=fileno(fp);
-            fcntl(fd, F_SETFL, O_RDONLY);
-        
-        live_transcoding_t obj;//=calloc(1,sizeof(live_transcoding_t));
-            obj.id=5;
-            obj.fd=fd;
-            
-            live_objects=(live_transcoding_t*)realloc(live_objects,(live_number+1)*sizeof(live_transcoding_t));
-            live_objects[live_number]=obj;
-            live_number++;
+//        
+//         //FILE *fp;
+//         int fd;
+//            //int rfd;
+//            //-analyzeduration 10000000
+//            char *base="ffmpeg -threads 4 -analyzeduration 10 -f mpegts -i http://%s -y -threads 4 -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -sn -b 20000k -f vob pipe:";
+//            char *cmd = calloc(strlen(base)+strlen(media_src), sizeof (char));
+//            printf("Source is: %s\n", media_src);
+//            sprintf(cmd, base, media_src);
+//        
+//        
+//            printf("Command is: %s\n", cmd);
+//            fp = popen(cmd, "r");
+//        
+//            if (!fp<0) {
+//                return NULL;
+//            }
+//            fd=fileno(fp);
+//            fcntl(fd, F_SETFL, O_RDONLY);
+//        
+//        live_transcoding_t obj;//=calloc(1,sizeof(live_transcoding_t));
+//            obj.id=5;
+//            obj.fd=fd;
+//            
+//            live_objects=(live_transcoding_t*)realloc(live_objects,(live_number+1)*sizeof(live_transcoding_t));
+//            live_objects[live_number]=obj;
+//            live_number++;
 
        /* printf("Command is: %s", cmd);
         if (!(fp = popen(cmd, "r"))) {
