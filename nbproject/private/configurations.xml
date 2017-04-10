@@ -74,6 +74,8 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
+        <gdb_signals>
+        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
@@ -94,8 +96,9 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d </runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommand>
+        <runcommand>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d</runcommand>
         <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>

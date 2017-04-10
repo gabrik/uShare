@@ -134,11 +134,33 @@ inline void display_headers (void);
 
 
 
+
+
+
+ typedef struct {
+    char* data;
+    size_t dimension;
+    off_t length;
+} video_buffer;
+
+typedef struct {
+    char *source;
+    video_buffer* buffer;
+    pthread_mutex_t lock;
+
+    enum status {
+        ON,
+        OFF
+    } status;
+    int fd;
+} transcode_args;
+
 typedef struct live_transcoding{
     int fd;
     int id;
+    transcode_args live;
+    
 } live_transcoding_t;
-
 
 live_transcoding_t* live_objects;
 size_t live_number;

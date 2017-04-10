@@ -443,8 +443,8 @@ cds_browse_directchildren (struct action_event_t *event,
                                     ut->dlna_flags, (*childs)->dlna_profile) :
 #endif /* HAVE_DLNA */
           mime_get_protocol ((*childs)->mime_type);
-
-#ifdef HAVE_DLNA
+// sigsev da VLC why????
+#ifdef HAVE_DLNA 
         (*childs)->dlna_profile ?
           didl_add_item (out, (*childs)->id,
                          (*childs)->parent ? (*childs)->parent->id : -1,
