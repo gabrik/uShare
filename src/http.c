@@ -476,6 +476,7 @@ http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
             obj.id=file->detail.local.entry->id;    
             live_transcoding_t* f = (live_transcoding_t*) bsearch ((void*)&obj, (void *)live_objects,live_number , sizeof (live_transcoding_t), cmpfunc);
             len = read(file->detail.live.fd, buf, buflen);
+            
             //len = (size_t) MIN(buflen, file->detail.live.buffer->dimension - file->detail.live.buffer->length);
             //pthread_mutex_lock(&(file->detail.live.lock));
             /*if (file->detail.live.status == ON){

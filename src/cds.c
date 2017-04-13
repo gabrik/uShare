@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <upnp/upnp.h>
 #include <upnp/upnptools.h>
+#include <string.h>
 
 #include "ushare.h"
 #include "services.h"
@@ -197,7 +198,7 @@ filter_has_val (const char *filter, const char *val)
       {
         if (*val == '@')
           token = strchr (token, '@');
-        if (token && !strncmp (token, val, len))
+        if (token && !strncmp (token, val, len))   //sigsev non può accedere all'area di memoria di token
         {
           ret = true;
           break;
@@ -443,7 +444,8 @@ cds_browse_directchildren (struct action_event_t *event,
                                     ut->dlna_flags, (*childs)->dlna_profile) :
 #endif /* HAVE_DLNA */
           mime_get_protocol ((*childs)->mime_type);
-// sigsev da VLC why????
+        
+//TODO sigsev da VLC/TimVision why????
 #ifdef HAVE_DLNA 
         (*childs)->dlna_profile ?
           didl_add_item (out, (*childs)->id,
@@ -548,8 +550,7 @@ cds_browse (struct action_event_t *event)
     result_count =
       cds_browse_metadata (event, out, index, count, entry, filter);
   else
-    result_count =
-      cds_browse_directchildren (event, out, index, count, entry, filter);
+    result_count =      cds_browse_directchildren (event, out, index, count, entry, filter);
   free (filter);
 
   if (result_count < 0)

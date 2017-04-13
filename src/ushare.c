@@ -191,10 +191,10 @@ static void ushare_signal_exit(void) {
 static void handle_action_request(struct Upnp_Action_Request *request) {
     struct service_t *service;
     struct service_action_t *action;
-    char val[256];
+    //char val[256];
     //uint32_t ip;
     char *ip;
-    if (!request || !ut)
+    if (request==NULL || ut==NULL)
         return;
 
     if (request->ErrCode != UPNP_E_SUCCESS)
