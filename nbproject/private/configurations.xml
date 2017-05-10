@@ -87,7 +87,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c /home/gabriele/Immagini</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -d -c /home/gabriele/Immagini </runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -d -c /home/gabriele/Immagini</runcommandpicklistitem>
@@ -96,6 +95,7 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d </runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v </runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommand>

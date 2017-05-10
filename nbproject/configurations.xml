@@ -55,6 +55,7 @@
             <incDir>
               <pElem>.</pElem>
               <pElem>/usr/include/upnp</pElem>
+              <pElem>/usr/local/include</pElem>
               <pElem>/usr/include/x86_64-linux-gnu</pElem>
             </incDir>
             <preprocessorList>

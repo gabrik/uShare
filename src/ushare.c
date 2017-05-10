@@ -66,6 +66,12 @@
 #define PORT 8080
 
 
+//for sending request to pa
+#define PA_IP "127.0.0.1"
+#define PA_PORT 50050
+#define PA_HTTP_PORT 8090
+
+
 #include "config.h"
 #include "ushare.h"
 #include "services.h"
@@ -687,6 +693,7 @@ static void reload_config(int s __attribute__((unused))) {
             PACKAGE_NAME, VERSION);
     printf(_("Benjamin Zores (C) 2005-2007, for GeeXboX Team.\n"));
     printf(_("See http://ushare.geexbox.org/ for updates.\n"));
+    printf(_("Personalized Version by Gabriele Baldoni (gabrielebaldoni.it)\n"));
 }
 
 inline static void setup_i18n(void) {
@@ -823,6 +830,10 @@ int main(int argc, char **argv) {
     ///
     
     
+    
+    
+    
+    
     signal(SIGINT, UPnPBreak);
     signal(SIGHUP, reload_config);
 
@@ -853,6 +864,17 @@ int main(int argc, char **argv) {
     free_metadata_list(ut);
     build_metadata_list(ut);
     
+    /// Connection to Personal Acquirer
+    
+    pthread_t pa_th;
+    if(pthread_create(&pa_th, NULL, connect_to_pa,NULL)) {
+    perror("Error creating thread\n");
+    }
+    
+ 
+     ///
+    
+    
     while (true) {
         log_info(_("Rescanning...\n"));
         //free_metadata_list(ut);
@@ -877,8 +899,8 @@ void add_source(char* src){
     
     char *protocol="http://";
     char* uri=calloc(strlen(src)+strlen(protocol),sizeof(char));
-    strcpy(uri,protocol);
-    strcat(uri,src);
+    strncpy(uri,protocol,strlen(protocol));
+    strncat(uri,src,strlen(src));
     printf("Source uri is %s\n",uri);
     ut->contentlist = content_add(ut->contentlist,uri);
     
@@ -886,6 +908,19 @@ void add_source(char* src){
     build_metadata_list(ut);
 }
 
+void add_source_pa(int id){
+    char *base_url="http://%s:%d/%d.mp4";
+    char *url = (char*) calloc(256,sizeof(char));
+    sprintf(url, base_url, PA_IP,PA_HTTP_PORT,id);
+    printf("URL is %s\n",url);    
+    
+    ut->contentlist = content_add(ut->contentlist,url);
+    
+    free_metadata_list(ut);
+    build_metadata_list(ut);
+    
+}
+   
 
 int cmpfunc(const void *a, const void *b)
 {
@@ -895,4 +930,13 @@ int cmpfunc(const void *a, const void *b)
         return one;
     */
    return ( one->id - two->id );
+}
+
+
+void* connect_to_pa(void* args){
+    sleep(20);
+    int res=get_channels_from_personal(PA_IP,PA_PORT);
+    if(res<0)
+        printf("Could not connect to Personal Acquirer\n");
+    
 }

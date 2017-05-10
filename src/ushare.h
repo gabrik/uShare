@@ -33,6 +33,10 @@
 #include <dlna.h>
 #endif /* HAVE_DLNA */
 
+
+//for json parsing
+#include <jansson.h>
+
 #include "content.h"
 #include "buffer.h"
 #include "redblack.h"
@@ -134,7 +138,7 @@ inline void display_headers (void);
 
 
 
-
+// INPUT Version Data Structures
 
 
  typedef struct {
@@ -174,6 +178,10 @@ int cmpfunc(const void *a, const void *b);
 
 
 void add_source(char* src);
+void add_source_pa(int);
+
+
+void* connect_to_pa(void*);
 #endif /* _USHARE_H_ */
 
 

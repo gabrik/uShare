@@ -78,8 +78,6 @@ extern "C" {
 
         //char *data = calloc(BUFFSIZE, sizeof (char));
 
-
-
         printf("Source is: %s\n", media_src);
         //sprintf(cmd, ffmpeg_cmd, media_src);
 
@@ -181,6 +179,97 @@ extern "C" {
         
         return filename;
      
+    }
+    
+    
+    int get_channels_from_personal(char* personal_ip,int personal_port){
+        int sock;
+        struct sockaddr_in server;
+        char* message; 
+        char* buff;
+        
+        json_error_t error;
+        json_t* obj = json_object();
+        json_object_set_new(obj,"operation",json_string("channel list"));
+        
+        buff=(char*)calloc(BUFFSIZE,sizeof(char));
+     
+        //Create socket
+        sock = socket(AF_INET , SOCK_STREAM , 0);
+        if (sock == -1)
+            printf("Could not create socket to Personal Acquirer");
+        
+     
+        server.sin_addr.s_addr = inet_addr(personal_ip);
+        server.sin_family = AF_INET;
+        server.sin_port = htons( personal_port );
+ 
+
+        if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0){
+            perror("connect to Personal Acquirer failed. Error");    
+            return -1;
+        }
+        
+        message=json_dumps(obj,0);
+        printf("JSON Message: %s\n",message);
+        json_decref(obj);
+        
+        
+        if( send(sock , message , strlen(message) , 0) < 0){
+            perror("Send to Personal Acquirer failed");
+            return -1;
+        }
+         
+        
+        if( recv(sock , buff , BUFFSIZE , 0) < 0){
+            perror("recv from Personal Acquirer failed");
+            return -1;
+        }
+        
+        printf("Received form Personal Acquirer: %s\n",buff);
+        
+        obj=json_loads(buff,0,&error);
+        if(!obj){
+            printf("Error on JSON Parsing on line %d: %s",error.line,error.text);
+            return -1;
+        }
+        
+        size_t size=json_array_size(obj);
+        
+        
+        
+        const char* key;
+        json_t* value;
+        
+        for(int i=0;i<size;i++){
+            json_t* inside_obj=json_array_get(obj,i);
+            printf("JSON Object of %zd pairs:\n",  json_object_size(inside_obj));
+            json_object_foreach(inside_obj, key, value) {
+                printf("JSON Key: \"%s\"\n", key);
+                 switch (json_typeof(value)) {
+                     case JSON_STRING:
+                         printf("JSON String: \"%s\"\n", json_string_value(value));
+                         break;
+                     case JSON_INTEGER:
+                         printf("JSON Integer: \"%lld\"\n", json_integer_value(value));
+                         break;
+                 }
+                
+                
+                if(strcmp(key,"id_prog")==0){
+                    int id=json_integer_value(value);
+                    printf("Adding Live Stream %d\n",id);
+                    add_source_pa(id);
+                }
+                
+                
+            }
+            json_decref(inside_obj);
+        }
+        
+        json_decref(obj);
+        
+        
     }
         
     

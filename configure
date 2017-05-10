@@ -666,6 +666,13 @@ if test "$dlna" = "yes"; then
   add_extralibs `pkg-config libdlna --libs`
 fi
 
+
+
+add_extralibs -lulfius
+add_extralibs -ljansson
+add_extralibs -lyder
+add_extralibs -lorcania
+add_extralibs -lcurl
 #################################################
 #   logging result
 #################################################
@@ -735,6 +742,9 @@ add_clog_str PACKAGE_NAME "uShare"
 add_clog_str SYSCONFDIR `expand_var "${sysconfdir}"`
 add_clog_str LOCALEDIR `expand_var "${localedir}"`
 test $nls = yes && add_clog CONFIG_NLS 1
+
+
+
 
 clean
 exit 0
