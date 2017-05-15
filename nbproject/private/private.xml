@@ -33,6 +33,12 @@
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/metadata.c</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/ushare.c</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/live.h</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/http.c</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/content.c</file>
+        </group>
     </open-files>
 </project-private>

@@ -334,7 +334,7 @@ http_open(const char *filename, enum UpnpOpenFileMode mode) {
         return NULL;
 
     log_verbose("Fullpath : %s\n", entry->fullpath);
-    //printf ("Fullpath : %s\n", entry->fullpath);
+
 
 
     if (isLiveMedia(entry->fullpath)) {
@@ -359,9 +359,10 @@ http_open(const char *filename, enum UpnpOpenFileMode mode) {
         
             FILE *fp;
             //int rfd;
-            //-analyzeduration 10000000
+            //-analyzeduration 10
             //-b 20000k
-            char *base="ffmpeg -threads auto -analyzeduration 10 -f mpegts -i %s -y -threads auto -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -b 100k -sn -f vob pipe:";
+            
+            char *base="ffmpeg -hide_banner -threads auto -acodec mp3 -vcodec h264 -f mpegts -i %s -y -threads auto -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -b 100k -sn -f vob pipe:";
             char *cmd = calloc(strlen(base)+strlen(entry->fullpath), sizeof (char));
             printf("Source is: %s\n", entry->fullpath);
             sprintf(cmd, base, entry->fullpath);

@@ -177,8 +177,8 @@ int cmpfunc(const void *a, const void *b);
 
 
 
-void add_source(char* src);
-void add_source_pa(int);
+void add_source(char*);
+void add_source_pa(char*);
 
 
 void* connect_to_pa(void*);

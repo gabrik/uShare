@@ -190,7 +190,7 @@ extern "C" {
         
         json_error_t error;
         json_t* obj = json_object();
-        json_object_set_new(obj,"operation",json_string("channel list"));
+        json_object_set_new(obj,"operation",json_string("provider list"));
         
         buff=(char*)calloc(BUFFSIZE,sizeof(char));
      
@@ -226,6 +226,9 @@ extern "C" {
             return -1;
         }
         
+        
+        close(sock);
+        
         printf("Received form Personal Acquirer: %s\n",buff);
         
         obj=json_loads(buff,0,&error);
@@ -256,9 +259,9 @@ extern "C" {
                  }
                 
                 
-                if(strcmp(key,"id_prog")==0){
-                    int id=json_integer_value(value);
-                    printf("Adding Live Stream %d\n",id);
+                if(strcmp(key,"name")==0){
+                    char* id=json_string_value(value);
+                    printf("Adding Live Stream %s\n",id);
                     add_source_pa(id);
                 }
                 
@@ -269,7 +272,7 @@ extern "C" {
         
         json_decref(obj);
         
-        
+        return size;
     }
         
     

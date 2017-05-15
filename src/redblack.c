@@ -133,8 +133,7 @@ static void RB_ENTRY(_closelist)(RBLIST *);
  * Returns a pointer to the top of the tree.
  */
 #ifndef RB_CUSTOMIZE
-RB_STATIC struct RB_ENTRY(tree) *
-rbinit(int (*cmp)(const void *, const void *, const void *), const void *config)
+RB_STATIC struct RB_ENTRY(tree) *rbinit(int (*cmp)(const void *, const void *, const void *), const void *config)
 #else
 RB_STATIC struct RB_ENTRY(tree) *RB_ENTRY(init)(void)
 #endif /* RB_CUSTOMIZE */

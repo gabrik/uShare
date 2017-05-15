@@ -908,8 +908,8 @@ void add_source(char* src){
     build_metadata_list(ut);
 }
 
-void add_source_pa(int id){
-    char *base_url="http://%s:%d/%d.mp4";
+void add_source_pa(char* id){
+    char *base_url="http://%s:%d/%s.mp4";
     char *url = (char*) calloc(256,sizeof(char));
     sprintf(url, base_url, PA_IP,PA_HTTP_PORT,id);
     printf("URL is %s\n",url);    
@@ -934,7 +934,7 @@ int cmpfunc(const void *a, const void *b)
 
 
 void* connect_to_pa(void* args){
-    sleep(20);
+    //sleep(20);
     int res=get_channels_from_personal(PA_IP,PA_PORT);
     if(res<0)
         printf("Could not connect to Personal Acquirer\n");

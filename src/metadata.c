@@ -37,7 +37,7 @@
 #include "gettext.h"
 #include "trace.h"
 
-
+#define DLNA_PROFILE_FILE "../dlna_lite.mp4"
 
 #define TITLE_UNKNOWN "unknown"
 
@@ -47,6 +47,8 @@ struct upnp_entry_lookup_t {
     int id;
     struct upnp_entry_t *entry_ptr;
 };
+
+
 
 static char *
 getExtension(const char *filename) {
@@ -183,12 +185,16 @@ static struct upnp_entry_t *upnp_entry_new(struct ushare_t *ut, const char *name
     entry->dlna_profile = NULL;
     entry->url = NULL;
     if (ut->dlna_enabled && fullpath && !dir) {
-        dlna_profile_t *p = dlna_guess_media_profile(ut->dlna, fullpath); //TODO genera SIGSEV se non è un file video
-        if (!p) {
-            free(entry);
-            return NULL;
-        }
-        entry->dlna_profile = p;
+        printf("Fullpath for guessing dlna profile is: %s\n",fullpath);
+        //if(!isLiveMedia(fullpath)){
+            dlna_profile_t *p =  dlna_guess_media_profile(ut->dlna, fullpath);
+            if (!p) {
+                free(entry);
+                return NULL;
+            }
+            entry->dlna_profile = p;
+        //} else 
+        //    entry->dlna_profile=dlna_guess_media_profile(ut->dlna,DLNA_PROFILE_FILE);
     }
 #endif /* HAVE_DLNA */
 
@@ -572,9 +578,7 @@ build_metadata_list(struct ushare_t *ut) {
     ut->init = 1;
 }
 
-int
-rb_compare(const void *pa, const void *pb,
-        const void *config __attribute__((unused))) {
+int rb_compare(const void *pa, const void *pb, const void *config __attribute__((unused))) {
     struct upnp_entry_lookup_t *a, *b;
 
     a = (struct upnp_entry_lookup_t *) pa;
