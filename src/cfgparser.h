@@ -35,7 +35,7 @@
 #define USHARE_ENABLE_DLNA        "USHARE_ENABLE_DLNA"
 
 #define USHARE_CONFIG_FILE        "ushare.conf"
-#define DEFAULT_USHARE_NAME       "uShare"
+#define DEFAULT_USHARE_NAME       "INPUT DMS"
 
 #if (defined(BSD) || defined(__FreeBSD__))
 #define DEFAULT_USHARE_IFACE      "lnc0"

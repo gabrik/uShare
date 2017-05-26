@@ -330,6 +330,7 @@ display_usage (void)
   printf (_(" -o, --override-iconv-err\tIf iconv fails parsing name, still add to media contents (hoping the renderer can handle it)\n"));
   printf (_(" -v, --verbose\t\tSet verbose display\n"));
   printf (_(" -x, --xbox\t\tUse XboX 360 compliant profile\n"));
+  printf (_(" -a, --acquirer\t\tINPUT vSTB Personal Acquirer Address\n"));
 #ifdef HAVE_DLNA
   printf (_(" -d, --dlna\t\tUse DLNA compliant profile (PlayStation3 needs this)\n"));
 #endif /* HAVE_DLNA */
@@ -342,11 +343,12 @@ int
 parse_command_line (struct ushare_t *ut, int argc, char **argv)
 {
   int c, index;
-  char short_options[] = "VhvDowtxdn:i:p:q:c:f:";
+  char short_options[] = "VhvDowtxdn:i:p:q:c:f:a:";
   struct option long_options [] = {
     {"version", no_argument, 0, 'V' },
     {"help", no_argument, 0, 'h' },
     {"verbose", no_argument, 0, 'v' },
+    {"acquirer",required_argument,0,'a'},
     {"daemon", no_argument, 0, 'D' },
     {"override-iconv-err", no_argument, 0, 'o' },
     {"name", required_argument, 0, 'n' },
@@ -429,6 +431,10 @@ parse_command_line (struct ushare_t *ut, int argc, char **argv)
 
     case 'x':
       ut->xbox360 = true;
+      break;
+    case 'a':
+      personal_acquirer_address = (char *) calloc(strlen(optarg),sizeof(char));
+      strncpy(personal_acquirer_address,optarg,strlen(optarg));
       break;
 
 #ifdef HAVE_DLNA

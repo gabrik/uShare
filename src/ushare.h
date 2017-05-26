@@ -149,9 +149,11 @@ inline void display_headers (void);
 
 typedef struct {
     char *source;
-    video_buffer* buffer;
+    char* buffer;
     pthread_mutex_t lock;
-
+    size_t dimension;
+    off_t i;
+    off_t j;
     enum status {
         ON,
         OFF
@@ -172,7 +174,7 @@ int cmpfunc(const void *a, const void *b);
 
 
 
-
+char *personal_acquirer_address;
 
 
 

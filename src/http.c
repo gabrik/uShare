@@ -59,10 +59,10 @@
 
 pthread_t t_read;
 
-
 struct web_file_t {
     char *fullpath;
     off_t pos;
+
     enum {
         FILE_LOCAL,
         FILE_MEMORY,
@@ -75,7 +75,7 @@ struct web_file_t {
             int fd;
             struct upnp_entry_t *entry;
         } local;
-        
+
         transcode_args live;
 
         struct {
@@ -85,55 +85,30 @@ struct web_file_t {
     } detail;
 };
 
+char* allocate_buffer(size_t dimension) {
 
-video_buffer* allocate_buffer(size_t dimension) {
-
-    video_buffer* vb = NULL;
-    vb = (video_buffer*) calloc(1, sizeof (video_buffer));
+    char* vb = NULL;
+    vb = (char*) calloc(dimension, sizeof (char));
     if (vb == NULL)
         return NULL;
-
-
-    vb->data = (char*) calloc(dimension, sizeof (char));
-    if (vb->data == NULL) {
-        //free(vb);
-        return NULL;
-    }
-    vb->dimension = dimension;
-    vb->length = 0;
-
-    //return 0;
     return vb;
 }
 
-void clear_buffer(video_buffer* vb) {
-    bzero(vb->data, vb->dimension);
-    vb->length = 0;
+
+void clear_buffer(char* vb, size_t dimension) {
+    bzero(vb, dimension);
 }
 
-off_t save_into_buffer(video_buffer* vb, char* buff,off_t current_length) {
-    if (current_length > 0) {
-        //memcpy(par->buffer.data, buff, current_length);
-        if (vb->length + current_length > vb->dimension) {
-            printf("Buffer size exceeded reallocating\n");
-            clear_buffer(vb);
-        }
 
-        strncat(vb->data, buff, current_length);
-        vb->length = vb->length + current_length;
-    }
-    return current_length;
-}
 
 
 
 void *read_thread(void *arg) {
 
     transcode_args* par = (transcode_args*) arg;
-    int buffsize = 2147483647;
+    int buffsize = 2147483647; //1048576
     char* buff = (char *) calloc(buffsize, sizeof (char));
     int len = 0;
-    off_t current_length;
     int milliseconds = 40;
     struct timespec ts;
 
@@ -144,18 +119,36 @@ void *read_thread(void *arg) {
     while (1) {
         nanosleep(&ts, NULL);
         pthread_mutex_lock(&(par->lock));
-        if (par->status == ON){
-            len=read(par->fd, buff, buffsize);
-            if(len>0)
-                current_length = save_into_buffer(par->buffer, buff,len);
+        if (par->status == ON) {
+            len = read(par->fd, buff, buffsize);
+
+            if (len > 0 && par->j + len <= par->dimension) {
+
+                printf("Buffer is not full,writing in %ld\n", par->j);
+
+                memcpy(&par->buffer[par->j], buff, len * sizeof ( char));
+                par->j = (par->j + len) % par->dimension;
+            } else {
+                if (len > 0 && par->j + len > par->dimension) {
+
+
+                    int num = par->dimension - par->j;
+                    printf("Buffer is full,writing in %ld -  %d bytes\n", par->j, num);
+
+                    memcpy(&par->buffer[par->j], buff, num * sizeof ( char));
+                    len = len - num;
+                    printf("Buffer is full,writing in 0 another %d bytes \n", len);
+
+                    memcpy(&par->buffer[0], &buff[num], len - 1 * sizeof ( char));
+                    if (len > par->i) {
+                        par->i = par->i + len;
+                    }
+                    par->j = par->i - 1;
+                }
+            }
         }
-            
-            
-        pthread_mutex_unlock(&(par->lock));
     }
 }
-
-
 
 static inline void set_info_file(struct File_Info *info, const size_t length,
         const char *content_type) {
@@ -279,8 +272,7 @@ static int http_get_info(const char *filename, struct File_Info *info) {
     return 0;
 }
 
-static UpnpWebFileHandle
-get_file_memory(const char *fullpath, const char *description,
+static UpnpWebFileHandle get_file_memory(const char *fullpath, const char *description,
         const size_t length) {
     struct web_file_t *file;
 
@@ -294,20 +286,18 @@ get_file_memory(const char *fullpath, const char *description,
     return ((UpnpWebFileHandle) file);
 }
 
-static UpnpWebFileHandle
-http_open(const char *filename, enum UpnpOpenFileMode mode) {
+static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode mode) {
     extern struct ushare_t *ut;
     struct upnp_entry_t *entry = NULL;
     struct web_file_t *file;
     int fd, upnp_id = 0;
-    
+
     transcode_args* th_args = (transcode_args*) calloc(1, sizeof (transcode_args));
 
     if (!filename)
         return NULL;
 
     log_verbose("http_open, filename : %s\n", filename);
-    //printf ("http_open, filename : %s\n", filename);
     if (mode != UPNP_READ)
         return NULL;
 
@@ -339,11 +329,11 @@ http_open(const char *filename, enum UpnpOpenFileMode mode) {
 
     if (isLiveMedia(entry->fullpath)) {
 
-        live_transcoding_t obj;// = calloc(1,sizeof(live_transcoding_t));
-        obj.id=entry->id;    
-        live_transcoding_t* f = (live_transcoding_t*) bsearch ((void*)&obj, (void *)live_objects,live_number , sizeof (live_transcoding_t), cmpfunc);
-        
-        if(live_number>0 && f!=NULL){
+        live_transcoding_t obj; // = calloc(1,sizeof(live_transcoding_t));
+        obj.id = entry->id;
+        live_transcoding_t* f = (live_transcoding_t*) bsearch((void*) &obj, (void *) live_objects, live_number, sizeof (live_transcoding_t), cmpfunc);
+
+        if (live_number > 0 && f != NULL) {
             printf("There are live streams...\n");
             printf("Stream already found!\n");
             file = malloc(sizeof (struct web_file_t));
@@ -352,71 +342,79 @@ http_open(const char *filename, enum UpnpOpenFileMode mode) {
             file->type = FILE_LIVE;
             file->detail.local.entry = entry;
             file->detail.local.fd = f->fd;
-            
-            file->detail.live=f->live;
-            
-        }else{
-        
+
+            file->detail.live = f->live;
+
+        } else {
+
             FILE *fp;
             //int rfd;
             //-analyzeduration 10
             //-b 20000k
-            
-            char *base="ffmpeg -hide_banner -threads auto -acodec mp3 -vcodec h264 -f mpegts -i %s -y -threads auto -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -b 100k -sn -f vob pipe:";
-            char *cmd = calloc(strlen(base)+strlen(entry->fullpath), sizeof (char));
+
+            //char *base="ffmpeg -hide_banner -threads auto -acodec mp3 -vcodec h264 -f mpegts -i %s -y -threads auto -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -b 100k -sn -f vob pipe:";
+            //char *base="nice -n -20 ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -y -acodec copy -vcodec copy -f mpegts pipe:";
+            char *base = "ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -y -acodec copy -vcodec copy -f mpegts pipe:";
+            char *cmd = calloc(strlen(base) + strlen(entry->fullpath), sizeof (char));
             printf("Source is: %s\n", entry->fullpath);
             sprintf(cmd, base, entry->fullpath);
-        
-        
+
+
             printf("Command is: %s\n", cmd);
             fp = popen(cmd, "r");
-        
-            if (!fp<0) {
+
+            if (!fp < 0) {
                 return NULL;
             }
-            fd=fileno(fp);
-            fcntl(fd, F_SETFL, O_RDONLY,O_SYNC,O_NDELAY);
-        
+            fd = fileno(fp);
+            fcntl(fd, F_SETFL, O_RDONLY, O_SYNC, O_NDELAY);
+
             file = malloc(sizeof (struct web_file_t));
             file->fullpath = strdup(entry->fullpath);
             file->pos = 0;
             file->type = FILE_LIVE;
             file->detail.local.entry = entry;
             file->detail.local.fd = fd;
-            
+
             if (pthread_mutex_init(&(th_args->lock), NULL) != 0) {
                 printf("\n mutex init failed\n");
                 exit(EXIT_FAILURE);
             }
-            
-            
+
+
             pthread_mutex_lock(&(th_args->lock));
             th_args->source = strdup(entry->fullpath);
-            th_args->buffer = allocate_buffer(25 * MB);
+            th_args->buffer = allocate_buffer(20 * KB);
             th_args->status = ON;
             th_args->fd = fd;
+            th_args->dimension = 20 * KB; //(5 * MB);
+            th_args->i = 0;
+            th_args->j = 0;
             pthread_mutex_unlock(&(th_args->lock));
-            
-            file->detail.live=*th_args;
-            
-            //file->detail.local.fd = fd;
-            
-            live_transcoding_t obj;//=calloc(1,sizeof(live_transcoding_t));
-            obj.id=entry->id;
-            obj.fd=fd;
-            obj.live=*th_args;
-            
-            live_objects=(live_transcoding_t*)realloc(live_objects,(live_number+1)*sizeof(live_transcoding_t));
-            live_objects[live_number]=obj;
+
+            file->detail.live = *th_args;
+
+
+
+
+            //lista dei file live accesi
+            live_transcoding_t obj; //=calloc(1,sizeof(live_transcoding_t));
+            obj.id = entry->id;
+            obj.fd = fd;
+            obj.live = *th_args;
+            /////
+
+            live_objects = (live_transcoding_t*) realloc(live_objects, (live_number + 1) * sizeof (live_transcoding_t));
+            live_objects[live_number] = obj;
             live_number++;
-            
+
             /*int err;
             err = pthread_create(&t_read, NULL, &read_thread, (void*) th_args);
             if (err != 0)
-                printf("\ncan't create thread :[%s]", strerror(err));
-            */
+                printf("\ncan't create thread :[%s]", strerror(err));*/
+
         }
-          
+
     } else {
         fd = open(entry->fullpath, O_RDONLY | O_NONBLOCK | O_SYNC | O_NDELAY);
         if (fd < 0)
@@ -433,33 +431,15 @@ http_open(const char *filename, enum UpnpOpenFileMode mode) {
     return ((UpnpWebFileHandle) file);
 }
 
-static int
-http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
+static int http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
     struct web_file_t *file = (struct web_file_t *) fh;
     ssize_t len = -1;
 
     log_verbose("http_read\n");
-    printf("Buffer size received %zd\n",buflen);
+    printf("Buffer size received %zd\n", buflen);
 
     if (!file)
         return -1;
-
-    /*if(isLiveMedia(file->fullpath)){
-        printf("This is a live media\n");
-        live_transcoding_t obj;// = calloc(1,sizeof(live_transcoding_t));
-        obj.id=file->detail.local.entry->id;    
-        live_transcoding_t* f = (live_transcoding_t*) bsearch ((void*)&obj, (void *)live_objects,live_number , sizeof (live_transcoding_t), cmpfunc);
-        //1048576
-        //buflen=1048576;
-        //buf=calloc(buflen,sizeof(char));
-        if(live_number>0 && f!=NULL){
-            log_verbose("Read local file.\n");
-            len = read(f->fd, buf, buflen);
-        }
-        log_verbose("Read %zd bytes.\n", len);
-        return len;
-    }*/
-    
 
     switch (file->type) {
         case FILE_LOCAL:
@@ -472,24 +452,29 @@ http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
             memcpy(buf, file->detail.memory.contents + file->pos, (size_t) len);
             break;
         case FILE_LIVE: // CASE FOR LIVE VIDEO
+            
+           
+
+            /////////////// WHITOUT BUFFER
             log_verbose("Read live file.\n");
-            live_transcoding_t obj;
-            obj.id=file->detail.local.entry->id;    
-            live_transcoding_t* f = (live_transcoding_t*) bsearch ((void*)&obj, (void *)live_objects,live_number , sizeof (live_transcoding_t), cmpfunc);
             len = read(file->detail.live.fd, buf, buflen);
+            ////////////////77
+
+
+            //////////// WITH BUFFER //////////////////
+
+            /*log_verbose("Read live file.\n");
             
-            //len = (size_t) MIN(buflen, file->detail.live.buffer->dimension - file->detail.live.buffer->length);
-            //pthread_mutex_lock(&(file->detail.live.lock));
-            /*if (file->detail.live.status == ON){
-                //len = MIN(buflen, file->detail.live.buffer->length);
-                //len=file->detail.live.buffer->length;
-                //free(buf);
-                //buf=(char *)calloc(len,sizeof(char));
-                memcpy(buf, file->detail.live.buffer->data, (size_t) len);
-            }*/
-            //pthread_mutex_unlock(&(file->detail.live.lock));
-            
-            
+            transcode_args f = file->detail.live;
+            pthread_mutex_lock(&(f.lock));
+            if (f.status == ON) {
+                len = MIN(buflen,f.dimension-f.i); 
+                if(f.i!=f.j)
+                    memcpy(buf, f.buffer[f.i], len);
+            }
+            pthread_mutex_unlock(&(f.lock));*/
+            ////////////////////////////////
+
             break;
         default:
             log_verbose("Unknown file type.\n");
@@ -500,12 +485,11 @@ http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
         file->pos += len;
 
     log_verbose("Read %zd bytes.\n", len);
-   
+
     return len;
 }
 
-static int
-http_write(UpnpWebFileHandle fh __attribute__((unused)),
+static int http_write(UpnpWebFileHandle fh __attribute__((unused)),
         char *buf __attribute__((unused)),
         size_t buflen __attribute__((unused))) {
     log_verbose("http write\n");
@@ -514,8 +498,7 @@ http_write(UpnpWebFileHandle fh __attribute__((unused)),
     return 0;
 }
 
-static int
-http_seek(UpnpWebFileHandle fh, off_t offset, int origin) {
+static int http_seek(UpnpWebFileHandle fh, off_t offset, int origin) {
     struct web_file_t *file = (struct web_file_t *) fh;
     off_t newpos = -1;
 
@@ -523,10 +506,11 @@ http_seek(UpnpWebFileHandle fh, off_t offset, int origin) {
 
     if (!file)
         return -1;
-    if (isLiveMedia(file->fullpath)){
+    if (file->type == FILE_LIVE) {
+        log_verbose("##\nLIVE FILE SEEK origin %d offset %d\n##",origin,offset);
         return 0;
     }
-    
+
 
     switch (origin) {
         case SEEK_SET:
@@ -582,14 +566,13 @@ http_seek(UpnpWebFileHandle fh, off_t offset, int origin) {
     }
 
     file->pos = newpos;
-    
-    
+
+
 
     return 0;
 }
 
-static int
-http_close(UpnpWebFileHandle fh) {
+static int http_close(UpnpWebFileHandle fh) {
     struct web_file_t *file = (struct web_file_t *) fh;
 
     log_verbose("http_close\n");
@@ -621,7 +604,7 @@ http_close(UpnpWebFileHandle fh) {
     return 0;
 }
 
-struct UpnpVirtualDirCallbacks virtual_dir_callbacks ={
+struct UpnpVirtualDirCallbacks virtual_dir_callbacks = {
     http_get_info,
     http_open,
     http_read,

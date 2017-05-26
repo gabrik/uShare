@@ -67,7 +67,7 @@
 
 
 //for sending request to pa
-#define PA_IP "127.0.0.1"
+//#define PA_IP "127.0.0.1"
 #define PA_PORT 50050
 #define PA_HTTP_PORT 8090
 
@@ -805,27 +805,29 @@ int main(int argc, char **argv) {
     
     //rest server
     
+    /*
+    
     if(ulfius_init_instance(&server_inst,PORT,NULL)!= U_OK){
         fprintf(stderr,"[ULFIUS] Error on REST Server instantiation\n");
         return EXIT_FAILURE;
     }
     ulfius_add_endpoint_by_val(&server_inst,"GET","test",NULL,NULL,NULL,NULL,&callback_test,NULL);
     ulfius_add_endpoint_by_val(&server_inst,"GET","add","/source/:ip",NULL,NULL,NULL,&callback_add_source,NULL);
-    
+    */
     /*url_format:        string used to define the endpoint format
      *                    separate words with /
      *                    to define a variable in the url, prefix it with @ or :
      *                    example: /test/resource/:name/elements
      *                    on an url_format that ends with '*', the rest of the url will not be tested
      */
-    
+    /*
     if(ulfius_start_framework(&server_inst)==U_OK)
         printf("[ULFIUS] REST Server started on port %d\n",server_inst.port);
     else{
         fprintf(stderr,"[ULFIUS] Erron on starting REST Framework\n");
         return EXIT_FAILURE;   
     }
-    
+    */
     
     ///
     
@@ -911,7 +913,7 @@ void add_source(char* src){
 void add_source_pa(char* id){
     char *base_url="http://%s:%d/%s.mp4";
     char *url = (char*) calloc(256,sizeof(char));
-    sprintf(url, base_url, PA_IP,PA_HTTP_PORT,id);
+    sprintf(url, base_url, personal_acquirer_address,PA_HTTP_PORT,id);
     printf("URL is %s\n",url);    
     
     ut->contentlist = content_add(ut->contentlist,url);
@@ -935,8 +937,8 @@ int cmpfunc(const void *a, const void *b)
 
 void* connect_to_pa(void* args){
     //sleep(20);
-    int res=get_channels_from_personal(PA_IP,PA_PORT);
+    int res=get_channels_from_personal(personal_acquirer_address,PA_PORT);
     if(res<0)
-        printf("Could not connect to Personal Acquirer\n");
+        printf("Could not connect to Personal Acquirer\nPA Address: %s\n",personal_acquirer_address);
     
 }
