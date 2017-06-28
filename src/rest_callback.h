@@ -24,6 +24,7 @@ extern "C" {
 #include <string.h>
 #include "live.h"
 
+
     char * print_map(const struct _u_map * map) {
         char * line, * to_return = NULL;
         const char **keys;
@@ -52,14 +53,150 @@ extern "C" {
 
     int callback_test(const struct _u_request * request, struct _u_response * response, void * user_data) {
         ulfius_set_string_response(response, 200, "Hello World!");
+        
+        
+        
         return U_OK;
     }
+    
+    
+    int callback_rescanning(const struct _u_request * request, struct _u_response * response, void * user_data) {
+        
+        
+        ulfius_set_string_response(response, 200, "{\"status\":\"success\"}");
+        
+        clear_all();
+        return U_OK;
+    }
+    
+    
+    
+    int callback_remove(const struct _u_request * request, struct _u_response * response, void * user_data){
+        char* url = request->http_url;
+        const char* key;
+        json_t* value;
+        json_error_t error;
+        json_t* obj = request->json_body;//json_object();
+        
+        printf("Called REST URL %s",url);
+        
+        response->string_body=nstrdup("{\"status\":\"success\"}");
+        response->status=200;
+        
+        //printf("Parameter is %s",obj);
+        
+        /*obj=json_loads(data_json,0,&error);
+        if(!obj){
+            printf("Error on JSON Parsing on line %d: %s",error.line,error.text);
+            return U_ERROR;
+        }*/
+        
+        
+        
+        printf("JSON Object of %zd pairs:\n",  json_object_size(obj));
+            json_object_foreach(obj, key, value) {
+                printf("JSON Key: \"%s\"\n", key);
+                 switch (json_typeof(value)) {
+                     case JSON_STRING:
+                         printf("JSON String: \"%s\"\n", json_string_value(value));
+                         break;
+                     case JSON_INTEGER:
+                         printf("JSON Integer: \"%lld\"\n", json_integer_value(value));
+                         break;
+                 }
+                
+                
+                if(strcmp(key,"address")==0){
+                    char* id=json_string_value(value);
+                    printf("Removing Live Stream %s\n",id);
+                    
+                    live_objects_t obj; // = calloc(1,sizeof(live_transcoding_t));
+                    obj.src=id;
+                    live_objects_t* f = (live_objects_t*) bsearch((void*) &obj, (void *) stream_map, stream_number, sizeof (live_objects_t), cmpfunc_streams);
+                    clear_obj(f->id);
+                    
+                }
+                
+                
+            }
+            json_decref(obj);
+    }
 
+
+    
+    
+    
+ int callback_add_live_media (const struct _u_request * request, struct _u_response * response, void * user_data) {
+        
+        char* url = request->http_url;
+        //char* data_json = u_map_get(request->map_url,"data");        
+        const char* key;
+        json_t* value;
+        json_error_t error;
+        json_t* obj = request->json_body;//json_object();
+        
+        printf("Called REST URL %s",url);
+        
+        response->string_body=nstrdup("{\"status\":\"success\"}");
+        response->status=200;
+        
+        //printf("Parameter is %s",obj);
+        
+        /*obj=json_loads(data_json,0,&error);
+        if(!obj){
+            printf("Error on JSON Parsing on line %d: %s",error.line,error.text);
+            return U_ERROR;
+        }*/
+        
+        
+        
+        printf("JSON Object of %zd pairs:\n",  json_object_size(obj));
+            json_object_foreach(obj, key, value) {
+                printf("JSON Key: \"%s\"\n", key);
+                 switch (json_typeof(value)) {
+                     case JSON_STRING:
+                         printf("JSON String: \"%s\"\n", json_string_value(value));
+                         break;
+                     case JSON_INTEGER:
+                         printf("JSON Integer: \"%lld\"\n", json_integer_value(value));
+                         break;
+                 }
+                
+                
+                if(strcmp(key,"address")==0){
+                    char* id=json_string_value(value);
+                    printf("Adding Live Stream %s\n",id);
+                    
+                    
+                    pthread_t pa_th;
+                    if(pthread_create(&pa_th, NULL, t_add_from_pa,(void*) id )) {
+                        perror("Error creating thread\n");
+                    }
+                    
+                    
+                    
+                    
+                    
+                }
+                
+                
+            }
+            json_decref(obj);
+               
+       
+        
+     
+        //ulfius_set_string_body_response(response, 200, "Hello World!");
+        return U_OK;
+    }
+ 
+
+    
     int callback_add_source(const struct _u_request * request, struct _u_response * response, void * user_data) {
         
         char* url = request->http_url;
         //char * url_params = print_map(request->map_url);
-        char* media_src = u_map_get(request->map_url, "ip");
+        char* media_src = request->json_body;
         printf("Called add source from url %s\n",url);
         
         response->string_body = nstrdup("ok");

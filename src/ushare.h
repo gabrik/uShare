@@ -37,6 +37,9 @@
 //for json parsing
 #include <jansson.h>
 
+//for rest
+#include <ulfius.h>
+
 #include "content.h"
 #include "buffer.h"
 #include "redblack.h"
@@ -159,6 +162,8 @@ typedef struct {
         OFF
     } status;
     int fd;
+    int f_out;
+    int f_in;
 } transcode_args;
 
 typedef struct live_transcoding{
@@ -168,12 +173,25 @@ typedef struct live_transcoding{
     
 } live_transcoding_t;
 
+typedef struct {
+    int id;
+    char *src;
+} live_objects_t;
+
+
+
 live_transcoding_t* live_objects;
+
+live_objects_t* stream_map;
+size_t stream_number;
+
 size_t live_number;
 int cmpfunc(const void *a, const void *b);
+int cmpfunc_streams(const void*,const void*);
 
 
-
+#define PA_PORT 50050
+#define PA_HTTP_PORT 8090
 char *personal_acquirer_address;
 
 
@@ -181,9 +199,11 @@ char *personal_acquirer_address;
 
 void add_source(char*);
 void add_source_pa(char*);
+void add_from_pa(char*);
 
-
+void* register_to_pa(void*);
 void* connect_to_pa(void*);
+void* t_add_from_pa(void*);
 #endif /* _USHARE_H_ */
 
 

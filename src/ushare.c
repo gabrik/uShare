@@ -68,8 +68,7 @@
 
 //for sending request to pa
 //#define PA_IP "127.0.0.1"
-#define PA_PORT 50050
-#define PA_HTTP_PORT 8090
+
 
 
 #include "config.h"
@@ -799,35 +798,41 @@ int main(int argc, char **argv) {
 
     // inizializzo live objects
     live_objects = NULL;
+    stream_map=NULL;
+    
     live_number=(size_t)0;
+    stream_number=(size_t)0;
+    
 
     
     
     //rest server
     
-    /*
+    
     
     if(ulfius_init_instance(&server_inst,PORT,NULL)!= U_OK){
         fprintf(stderr,"[ULFIUS] Error on REST Server instantiation\n");
         return EXIT_FAILURE;
     }
     ulfius_add_endpoint_by_val(&server_inst,"GET","test",NULL,NULL,NULL,NULL,&callback_test,NULL);
-    ulfius_add_endpoint_by_val(&server_inst,"GET","add","/source/:ip",NULL,NULL,NULL,&callback_add_source,NULL);
-    */
+    ulfius_add_endpoint_by_val(&server_inst,"POST","add","/source/",NULL,NULL,NULL,&callback_add_live_media,NULL);
+    ulfius_add_endpoint_by_val(&server_inst,"POST","remove","/content/",NULL,NULL,NULL,&callback_rescanning,NULL);
+    
     /*url_format:        string used to define the endpoint format
      *                    separate words with /
      *                    to define a variable in the url, prefix it with @ or :
      *                    example: /test/resource/:name/elements
      *                    on an url_format that ends with '*', the rest of the url will not be tested
      */
-    /*
+    
     if(ulfius_start_framework(&server_inst)==U_OK)
         printf("[ULFIUS] REST Server started on port %d\n",server_inst.port);
     else{
         fprintf(stderr,"[ULFIUS] Erron on starting REST Framework\n");
         return EXIT_FAILURE;   
     }
-    */
+    
+
     
     ///
     
@@ -869,7 +874,7 @@ int main(int argc, char **argv) {
     /// Connection to Personal Acquirer
     
     pthread_t pa_th;
-    if(pthread_create(&pa_th, NULL, connect_to_pa,NULL)) {
+    if(pthread_create(&pa_th, NULL, register_to_pa,NULL)) {
     perror("Error creating thread\n");
     }
     
@@ -924,6 +929,42 @@ void add_source_pa(char* id){
 }
    
 
+void clear_obj(int id){
+    
+    printf("Clear Content %d",id);
+    ut->contentlist=content_del(ut->contentlist,id);
+    free_metadata_list(ut);
+    build_metadata_list(ut);
+    
+    
+}
+
+
+void add_from_pa(char* id){
+    char *base_url="http://%s:%d/%s";
+    char *url = (char*) calloc(256,sizeof(char));
+    sprintf(url, base_url, personal_acquirer_address,PA_HTTP_PORT,id);
+    printf("URL is %s\n",url);    
+    
+    ut->contentlist = content_add(ut->contentlist,url);
+    
+    
+    //lista dei file live accesi
+    live_objects_t obj; //=calloc(1,sizeof(live_transcoding_t));
+    obj.id = ut->contentlist->count;
+    obj.src=strdupa(id);
+
+    stream_map = (live_objects_t*) realloc(stream_map, (stream_number + 1) * sizeof (live_objects_t));
+    stream_map[stream_number] = obj;
+    stream_number++;
+    
+    
+    
+    free_metadata_list(ut);
+    build_metadata_list(ut);
+    
+}
+
 int cmpfunc(const void *a, const void *b)
 {
     live_transcoding_t* one = (live_transcoding_t*)a;
@@ -934,6 +975,69 @@ int cmpfunc(const void *a, const void *b)
    return ( one->id - two->id );
 }
 
+int cmpfunc_streams(const void *a, const void *b)
+{
+    live_objects_t* one = (live_objects_t*)a;
+    live_objects_t* two = (live_transcoding_t*)b;
+    /*if(one->id == two->id)
+        return one;
+    */
+   return ( strcmp(one->src,two->src) );
+}
+
+
+
+
+
+void* register_to_pa(void *args){
+    
+        int sock;
+        struct sockaddr_in server;
+        char* message; 
+        char* buff;
+        
+        json_error_t error;
+        json_t* obj = json_object();
+        json_object_set_new(obj,"operation",json_string("register dms"));
+        
+        buff=(char*)calloc(BUFFSIZE,sizeof(char));
+    
+        sock = socket(AF_INET , SOCK_STREAM , 0);
+        if (sock == -1)
+            printf("Could not create socket to Personal Acquirer");
+        
+     
+        server.sin_addr.s_addr = inet_addr(personal_acquirer_address);
+        server.sin_family = AF_INET;
+        server.sin_port = htons( PA_PORT );
+ 
+
+        if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0){
+            perror("connect to Personal Acquirer failed. Error");    
+            return -1;
+        }
+        
+        message=json_dumps(obj,0);
+        printf("JSON Message: %s\n",message);
+        json_decref(obj);
+        
+        
+        if( send(sock , message , strlen(message) , 0) < 0){
+            perror("Send to Personal Acquirer failed");
+            return -1;
+        }
+         
+        
+        if( recv(sock , buff , BUFFSIZE , 0) < 0){
+            perror("recv from Personal Acquirer failed");
+            return -1;
+        }
+        
+        
+        
+        
+        close(sock);
+}
 
 void* connect_to_pa(void* args){
     //sleep(20);
@@ -941,4 +1045,12 @@ void* connect_to_pa(void* args){
     if(res<0)
         printf("Could not connect to Personal Acquirer\nPA Address: %s\n",personal_acquirer_address);
     
+}
+
+
+void* t_add_from_pa(void* args){
+    
+    char *src=(char*) args;
+    printf("Adding %s from PA",src);
+    add_from_pa(src);
 }

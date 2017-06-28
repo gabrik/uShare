@@ -94,14 +94,138 @@ char* allocate_buffer(size_t dimension) {
     return vb;
 }
 
-
 void clear_buffer(char* vb, size_t dimension) {
     bzero(vb, dimension);
 }
 
+#define CHUNK_SIZE 1024
+
+int receive_basic(int s, size_t max_len, char *buff) {
+    int size_recv, total_size = 0;
+    char chunk[CHUNK_SIZE];
+    struct timeval begin, now;
+    double timediff;
+    int timeout = 100000;
+
+
+    fcntl(s, F_SETFL, O_NONBLOCK);
+
+    //beginning time
+    gettimeofday(&begin, NULL);
+
+    //loop
+    while (total_size < max_len) {
+        gettimeofday(&now, NULL);
+
+        //time elapsed in seconds
+        //timediff = (now.tv_sec - begin.tv_sec) + 1e-6 * (now.tv_usec - begin.tv_usec);
+        timediff = (now.tv_usec - begin.tv_usec);
+
+        //if you got some data, then break after timeout
+        /*if( total_size > 0 && timediff > timeout )
+        {
+            break;
+        }
+         
+        //if you got no data at all, wait a little longer, twice the timeout
+        else if( timediff > timeout*2)
+        {
+            break;
+        }*/
+
+        memset(chunk, 0, CHUNK_SIZE); //clear the variable
+        if ((size_recv = recv(s, chunk, CHUNK_SIZE, 0)) < 0) {
+            usleep(10000);
+        } else {
+            char *bb = "%s%s";
+            //memcpy(buff+total_size, chunk,size_recv);
+            total_size += size_recv;
+            sprintf(buff, bb, buff, chunk);
+
+            //printf("%s" , chunk);
+        }
+    }
+
+    return total_size;
+}
+
+size_t read_from_pa(char *data, char* src, size_t lenght) {
+
+    int sock;
+    struct sockaddr_in pa;
+    char* http_base = "GET %s HTTP/1.1\r\nUser-Agent: Lavf/56.40.101\r\nAccept: */*\r\nRange: bytes=0-\r\nConnection: close\r\nHost: 127.0.0.1:8090\r\nIcy-MetaData: 1\r\n\r\n";
+    char* message;
+    char* reply;
+    size_t len = -1;
+
+    char *response = "HTTP/1.0 200 OK\r\\nContent-type: application/octet-stream\r\nCache-Control: no-cache\r\n\r\n";
+
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == -1) {
+        perror("Cannot create socket!");
+        exit(EXIT_FAILURE);
+    }
+    //log_verbose("Socket created\n");
+
+    pa.sin_addr.s_addr = inet_addr(personal_acquirer_address);
+    pa.sin_family = AF_INET;
+    pa.sin_port = htons(PA_HTTP_PORT);
+
+    //fcntl(sock, F_SETFL,  O_NONBLOCK);
+
+
+    //Connect to remote server
+    if (connect(sock, (struct sockaddr *) &pa, sizeof (pa)) < 0) {
+        perror("connect failed. Error");
+        exit(EXIT_FAILURE);
+    }
+
+    //log_verbose("Connected\n");
+
+
+    message = (char *) calloc(strlen(http_base) + strlen(src), sizeof (char));
+    sprintf(message, http_base, src);
+
+    //log_verbose("Sending\n %s",message);
+
+    if (send(sock, message, strlen(message), 0) < 0) {
+        perror("Send failed");
+        exit(EXIT_FAILURE);
+    }
 
 
 
+    reply = (char *) calloc(lenght, sizeof (char));
+
+
+
+    len = receive_basic(sock, lenght, reply);
+
+    if (len < 0) {
+        perror("recv failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (len == 0) {
+        return 0;
+    }
+    //log_verbose("Len is %zd\n\n",len);
+
+    char *p = strstr(reply, "\r\n\r\n");
+    /*snprintf(reply,"%s",p);   
+    
+    printf("\n\n\n####### Server reply ############\n %s\n####################\n",reply);
+     */
+    close(sock);
+
+    memcpy(data, p + 4, lenght - strlen(reply));
+    free(reply);
+    free(message);
+    return len;
+
+
+
+}
 
 void *read_thread(void *arg) {
 
@@ -113,16 +237,33 @@ void *read_thread(void *arg) {
     struct timespec ts;
 
 
+
     ts.tv_sec = milliseconds / 1000;
     ts.tv_nsec = (milliseconds % 1000) * 1000000;
 
-    while (1) {
-        nanosleep(&ts, NULL);
-        pthread_mutex_lock(&(par->lock));
-        if (par->status == ON) {
-            len = read(par->fd, buff, buffsize);
+    log_verbose("Read thread started!\n");
 
-            if (len > 0 && par->j + len <= par->dimension) {
+    FILE* fp = fdopen(par->f_out, "w");
+    while (1) {
+        //nanosleep(&ts, NULL);
+        pthread_mutex_lock(&(par->lock));
+        if (/*par->status == ON*/1) {
+            len = read(par->fd, buff, buffsize);
+            if (lseek(par->f_in, 0, SEEK_END) == -1) {
+                    log_verbose("%s: cannot seek: %s\n", par->source, strerror(errno));
+            }
+            write(par->f_out, buff, buffsize);
+
+            
+            if(fflush(fp)<0)
+                perror("Error on fflush()");
+            //fprintf(par->f_out, "%s", buff);
+
+            if (fsync(par->f_out) < 0) {
+                perror("Error on fsync()");
+            }
+
+            /*if (len > 0 && par->j + len <= par->dimension) {
 
                 printf("Buffer is not full,writing in %ld\n", par->j);
 
@@ -145,8 +286,9 @@ void *read_thread(void *arg) {
                     }
                     par->j = par->i - 1;
                 }
-            }
+            }*/
         }
+        pthread_mutex_unlock(&(par->lock));
     }
 }
 
@@ -354,7 +496,10 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
 
             //char *base="ffmpeg -hide_banner -threads auto -acodec mp3 -vcodec h264 -f mpegts -i %s -y -threads auto -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -b 100k -sn -f vob pipe:";
             //char *base="nice -n -20 ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -y -acodec copy -vcodec copy -f mpegts pipe:";
-            char *base = "ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -y -acodec copy -vcodec copy -f mpegts pipe:";
+
+            char *base = "ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -preset ultrafast -y -acodec copy -vcodec copy -f mpegts pipe:";
+            //char *base = "ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -y -acodec copy -vcodec copy -segment_time 4 -f segment test.mp4";
+            
             char *cmd = calloc(strlen(base) + strlen(entry->fullpath), sizeof (char));
             printf("Source is: %s\n", entry->fullpath);
             sprintf(cmd, base, entry->fullpath);
@@ -369,6 +514,10 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
             fd = fileno(fp);
             fcntl(fd, F_SETFL, O_RDONLY, O_SYNC, O_NDELAY);
 
+
+
+
+
             file = malloc(sizeof (struct web_file_t));
             file->fullpath = strdup(entry->fullpath);
             file->pos = 0;
@@ -376,11 +525,31 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
             file->detail.local.entry = entry;
             file->detail.local.fd = fd;
 
+
             if (pthread_mutex_init(&(th_args->lock), NULL) != 0) {
                 printf("\n mutex init failed\n");
                 exit(EXIT_FAILURE);
             }
 
+/*
+            char *fname=(char*)calloc(256,sizeof(char));
+            strcpy(fname,"test.mp4XXXXXX");
+            int temp = mkstemp(fname);//open("test.mp4", O_DSYNC | O_NDELAY | O_WRONLY | O_EXCL | O_CREAT, 0666);
+            if (temp < 0) {
+                perror("Error on opening temp file!");
+                exit(EXIT_FAILURE);
+            }
+*/
+            /*int temp2=0;
+            while(temp2<=0)
+            {
+                sleep(5);
+                temp2 = open("test.mp4", O_NONBLOCK | O_SYNC | O_NDELAY | O_RDONLY);
+                if (temp2 < 0) {
+                    perror("Error on opening temp file!");
+                    //exit(EXIT_FAILURE);
+                }
+            }*/
 
             pthread_mutex_lock(&(th_args->lock));
             th_args->source = strdup(entry->fullpath);
@@ -390,6 +559,8 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
             th_args->dimension = 20 * KB; //(5 * MB);
             th_args->i = 0;
             th_args->j = 0;
+            //th_args->f_in = temp2;
+            //th_args->f_out = temp2;
             pthread_mutex_unlock(&(th_args->lock));
 
             file->detail.live = *th_args;
@@ -408,10 +579,12 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
             live_objects[live_number] = obj;
             live_number++;
 
-            /*int err;
+/*
+            int err;
             err = pthread_create(&t_read, NULL, &read_thread, (void*) th_args);
             if (err != 0)
-                printf("\ncan't create thread :[%s]", strerror(err));*/
+                printf("\ncan't create thread :[%s]", strerror(err));
+*/
 
         }
 
@@ -434,6 +607,8 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
 static int http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
     struct web_file_t *file = (struct web_file_t *) fh;
     ssize_t len = -1;
+    FILE *f;
+    struct stat st;
 
     log_verbose("http_read\n");
     printf("Buffer size received %zd\n", buflen);
@@ -452,13 +627,50 @@ static int http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
             memcpy(buf, file->detail.memory.contents + file->pos, (size_t) len);
             break;
         case FILE_LIVE: // CASE FOR LIVE VIDEO
-            
-           
+
+
 
             /////////////// WHITOUT BUFFER
             log_verbose("Read live file.\n");
             len = read(file->detail.live.fd, buf, buflen);
-            ////////////////77
+            //////////////////
+
+
+
+            //READ FROM SOCKET TEST
+            //log_verbose("Read live file. (Socket read)\n");
+            //len = read_from_pa(buf,file->detail.live.source,32000);
+
+
+            /// WITH FILE
+
+//            pthread_mutex_lock(&(file->detail.live.lock));
+//            if (fstat(file->detail.live.f_in, &st) < 0)
+//                return 0;
+//
+//            int file_len = st.st_size;
+//            if(file_len==0)
+//                return 0;
+//            if (file_len > buflen) {
+//                if (lseek(file->detail.live.f_in, buflen, SEEK_END) == -1) {
+//                    log_verbose("%s: cannot seek: %s\n", file->detail.live.source, strerror(errno));
+//                    return 0;
+//                }
+//
+//            } else {
+//                if (lseek(file->detail.live.f_in, file_len, SEEK_END) == -1) {
+//                    log_verbose("%s: cannot seek: %s\n", file->detail.live.source, strerror(errno));
+//                    return 0;
+//                }
+//
+//            }
+//            len = read(file->detail.live.f_in, buf, buflen);
+//            pthread_mutex_unlock(&(file->detail.live.lock));
+
+
+
+
+            ///
 
 
             //////////// WITH BUFFER //////////////////
@@ -507,7 +719,7 @@ static int http_seek(UpnpWebFileHandle fh, off_t offset, int origin) {
     if (!file)
         return -1;
     if (file->type == FILE_LIVE) {
-        log_verbose("##\nLIVE FILE SEEK origin %d offset %d\n##",origin,offset);
+        //log_verbose("##\nLIVE FILE SEEK origin %d offset %d\n##", origin, offset);
         return 0;
     }
 

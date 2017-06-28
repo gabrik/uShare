@@ -24,8 +24,7 @@
 
 #include "content.h"
 
-content_list *
-content_add(content_list *list, const char *item)
+content_list *content_add(content_list *list, const char *item)
 {
   if (!list)
   {
@@ -50,8 +49,7 @@ content_add(content_list *list, const char *item)
 /*
  * Remove the n'th content (start from 0)
  */
-content_list *
-content_del(content_list *list, int n)
+content_list *content_del(content_list *list, int n)
 {
   int i;
 
@@ -73,8 +71,7 @@ content_del(content_list *list, int n)
   return list;
 }
 
-void
-content_free(content_list *list)
+void content_free(content_list *list)
 {
   int i;
   if (!list)
