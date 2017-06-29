@@ -186,6 +186,9 @@ static struct upnp_entry_t *upnp_entry_new(struct ushare_t *ut, const char *name
     entry->url = NULL;
     if (ut->dlna_enabled && fullpath && !dir) {
         printf("Fullpath for guessing dlna profile is: %s\n",fullpath);
+        
+        
+        
         //if(!isLiveMedia(fullpath)){
             dlna_profile_t *p =  dlna_guess_media_profile(ut->dlna, fullpath);
             if (!p) {
@@ -238,6 +241,9 @@ static struct upnp_entry_t *upnp_entry_new(struct ushare_t *ut, const char *name
             log_error("URL string too long for id %d, truncated!!", entry->id);
 
         /* Only malloc() what we really need */
+        
+        //TODO PROVARE LIVE con FFSERVER
+        
         entry->url = strdup(url_tmp);
     } else /* container */ {
         entry->mime_type = &Container_MIME_Type;
@@ -280,8 +286,43 @@ static struct upnp_entry_t *upnp_entry_new(struct ushare_t *ut, const char *name
     entry->size = size;
     entry->fd = -1;
 
-    if (entry->id && entry->url)
+    if (entry->id && entry->url){
+        
+        
+        
+        
         log_verbose("Entry->URL (%d): %s\n", entry->id, entry->url);
+        
+        if(isLiveMedia(fullpath)){
+            //lista dei file live accesi
+
+            
+            
+            
+            live_objects_t obj; // = calloc(1,sizeof(live_transcoding_t));
+            obj.src=strdup(fullpath);
+            
+            GSList* gs =g_slist_find_custom (stream_map, (gconstpointer) &obj,(GCompareFunc)g_cmpfunc_stream);
+            if(gs){
+                live_objects_t* f=(live_objects_t*) gs->data;        
+                f->id=entry->id;
+            }
+            
+           
+            
+                
+            
+            
+            
+            
+        }
+        
+        
+    }
+        
+    
+    
+    
 
     return entry;
 }
@@ -461,7 +502,7 @@ metadata_add_container(struct ushare_t *ut,
 
     if (isLiveMedia(container))  {
         printf("%s is a live media\n",container);
-        metadata_add_live(ut,entry,container,"live");
+        metadata_add_live(ut,entry,container,"live");  //TODO VEDERE DI SISTEMARE 
         //struct stat st_live;
        
         /*if (stat(container, &st_live) < 0) {

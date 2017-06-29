@@ -40,6 +40,9 @@
 //for rest
 #include <ulfius.h>
 
+//for list
+#include <glib.h>
+
 #include "content.h"
 #include "buffer.h"
 #include "redblack.h"
@@ -164,11 +167,16 @@ typedef struct {
     int fd;
     int f_out;
     int f_in;
+    int upnp_id;
+    
 } transcode_args;
 
 typedef struct live_transcoding{
     int fd;
     int id;
+    FILE *fp;
+    time_t last_read;
+    int startup;
     transcode_args live;
     
 } live_transcoding_t;
@@ -176,18 +184,23 @@ typedef struct live_transcoding{
 typedef struct {
     int id;
     char *src;
+    int c_id;
 } live_objects_t;
 
 
 
-live_transcoding_t* live_objects;
+GSList *live_streams_list;
 
-live_objects_t* stream_map;
-size_t stream_number;
+GSList *stream_map;
+
+
 
 size_t live_number;
 int cmpfunc(const void *a, const void *b);
 int cmpfunc_streams(const void*,const void*);
+gint g_cmpfunc(gpointer,gpointer);
+
+gint g_cmpfunc_stream(gpointer, gpointer);
 
 
 #define PA_PORT 50050
@@ -195,8 +208,8 @@ int cmpfunc_streams(const void*,const void*);
 char *personal_acquirer_address;
 
 
-
-
+char* get_pa_media_uri(char*);
+void clear_obj(int,int);
 void add_source(char*);
 void add_source_pa(char*);
 void add_from_pa(char*);
@@ -204,6 +217,7 @@ void add_from_pa(char*);
 void* register_to_pa(void*);
 void* connect_to_pa(void*);
 void* t_add_from_pa(void*);
+void* t_monitoring_pipe(void*);
 #endif /* _USHARE_H_ */
 
 

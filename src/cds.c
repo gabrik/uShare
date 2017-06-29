@@ -295,8 +295,18 @@ didl_add_item (struct buffer_t *out, int item_id,
     if (url)
     {
       extern struct ushare_t *ut;
-      buffer_appendf (out, "http://%s:%d%s/%s",
-                      UpnpGetServerIpAddress (), ut->port, VIRTUAL_DIR, url);
+      buffer_appendf (out, "http://%s:%d%s/%s",UpnpGetServerIpAddress (), ut->port, VIRTUAL_DIR, url); 
+      
+      
+      char *url_to_print = (char*) calloc(256,sizeof(char));
+      sprintf(url_to_print,"http://%s:%d%s/%s", UpnpGetServerIpAddress(), ut->port, VIRTUAL_DIR, url);
+      //sprintf(url_to_print,"http://%s:%d/%s", personal_acquirer_address, 8090, "InputProvider1.mp4" );
+      printf("Title is %s ID is %d\nURL is %s\n",title,item_id,url_to_print);
+      
+      
+      //buffer_appendf (out, url_to_print); 
+      
+      
     }
     buffer_appendf (out, "</%s>", DIDL_RES);
   }

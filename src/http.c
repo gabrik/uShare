@@ -471,7 +471,7 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
 
     if (isLiveMedia(entry->fullpath)) {
 
-        live_transcoding_t obj; // = calloc(1,sizeof(live_transcoding_t));
+       /* live_transcoding_t obj; // = calloc(1,sizeof(live_transcoding_t));
         obj.id = entry->id;
         live_transcoding_t* f = (live_transcoding_t*) bsearch((void*) &obj, (void *) live_objects, live_number, sizeof (live_transcoding_t), cmpfunc);
 
@@ -487,7 +487,7 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
 
             file->detail.live = f->live;
 
-        } else {
+        } else { */
 
             FILE *fp;
             //int rfd;
@@ -512,7 +512,7 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
                 return NULL;
             }
             fd = fileno(fp);
-            fcntl(fd, F_SETFL, O_RDONLY, O_SYNC, O_NDELAY);
+            fcntl(fd, F_SETFL, O_RDONLY, O_SYNC, O_NDELAY,O_NONBLOCK);
 
 
 
@@ -524,6 +524,8 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
             file->type = FILE_LIVE;
             file->detail.local.entry = entry;
             file->detail.local.fd = fd;
+            
+                   
 
 
             if (pthread_mutex_init(&(th_args->lock), NULL) != 0) {
@@ -559,6 +561,7 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
             th_args->dimension = 20 * KB; //(5 * MB);
             th_args->i = 0;
             th_args->j = 0;
+            th_args->upnp_id=entry->id;
             //th_args->f_in = temp2;
             //th_args->f_out = temp2;
             pthread_mutex_unlock(&(th_args->lock));
@@ -569,15 +572,24 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
 
 
             //lista dei file live accesi
-            live_transcoding_t obj; //=calloc(1,sizeof(live_transcoding_t));
-            obj.id = entry->id;
-            obj.fd = fd;
-            obj.live = *th_args;
+            live_transcoding_t* obj=(live_transcoding_t*)calloc(1,sizeof(live_transcoding_t));
+            obj->id = entry->id;
+            obj->fd = fd;
+            obj->live = *th_args;
+            obj->fp=fp;
+            obj->last_read=0;
+            obj->startup=0;
             /////
-
+            
+            live_streams_list = g_slist_append(live_streams_list,(gpointer) obj );
+            printf("List size is now: %o\n",g_slist_length (live_streams_list));
+            printf("ID is %d\n",((live_transcoding_t *) live_streams_list->data)->id);
+            /*
+            
+            
             live_objects = (live_transcoding_t*) realloc(live_objects, (live_number + 1) * sizeof (live_transcoding_t));
             live_objects[live_number] = obj;
-            live_number++;
+            live_number++;*/
 
 /*
             int err;
@@ -586,7 +598,7 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
                 printf("\ncan't create thread :[%s]", strerror(err));
 */
 
-        }
+       // }
 
     } else {
         fd = open(entry->fullpath, O_RDONLY | O_NONBLOCK | O_SYNC | O_NDELAY);
@@ -633,6 +645,19 @@ static int http_read(UpnpWebFileHandle fh, char *buf, size_t buflen) {
             /////////////// WHITOUT BUFFER
             log_verbose("Read live file.\n");
             len = read(file->detail.live.fd, buf, buflen);
+            
+            live_transcoding_t obj; // = calloc(1,sizeof(live_transcoding_t));
+        
+            obj.id = file->detail.live.upnp_id;
+            
+            GSList* gs =g_slist_find_custom (live_streams_list, (gconstpointer) &obj,(GCompareFunc)g_cmpfunc);
+            if(gs){
+                live_transcoding_t* f=(live_transcoding_t*) gs->data;        
+                f->last_read=time(NULL);
+            }
+            
+            
+            
             //////////////////
 
 
@@ -714,7 +739,7 @@ static int http_seek(UpnpWebFileHandle fh, off_t offset, int origin) {
     struct web_file_t *file = (struct web_file_t *) fh;
     off_t newpos = -1;
 
-    log_verbose("http_seek\n");
+    //log_verbose("http_seek\n");
 
     if (!file)
         return -1;

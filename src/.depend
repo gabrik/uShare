@@ -14,7 +14,7 @@ services.o: services.c ushare.h content.h buffer.h redblack.h services.h \
  cms.h cds.h msr.h trace.h
 buffer.o: buffer.c buffer.h minmax.h
 util_iconv.o: util_iconv.c util_iconv.h
-content.o: content.c content.h
+content.o: content.c content.h ushare.h buffer.h redblack.h
 cfgparser.o: cfgparser.c ../config.h gettext.h cfgparser.h ushare.h \
  content.h buffer.h redblack.h trace.h osdep.h
 trace.o: trace.c ../config.h trace.h ushare.h content.h buffer.h \

@@ -583,6 +583,7 @@ check_cflags -D_FILE_OFFSET_BITS=64
 check_cflags -D_REENTRANT
 linux && add_cflags -D_GNU_SOURCE
 
+
 #################################################
 #   check for debug symbols
 #################################################
@@ -673,6 +674,8 @@ add_extralibs -ljansson
 add_extralibs -lyder
 add_extralibs -lorcania
 add_extralibs -lcurl
+add_extralibs -lglib-2.0
+add_cflags `pkg-config --cflags glib-2.0`
 #################################################
 #   logging result
 #################################################

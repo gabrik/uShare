@@ -39,9 +39,7 @@
 #define CGI_PATH "path"
 #define CGI_SHARE "share"
 
-int
-process_cgi (struct ushare_t *ut, char *cgiargs)
-{
+int process_cgi (struct ushare_t *ut, char *cgiargs){
   char *action = NULL;
   int refresh = 0;
 
@@ -118,9 +116,7 @@ process_cgi (struct ushare_t *ut, char *cgiargs)
   return 0;
 }
 
-int
-build_presentation_page (struct ushare_t *ut)
-{
+int build_presentation_page (struct ushare_t *ut){
   int i;
   char *mycodeset = NULL;
 

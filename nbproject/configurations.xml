@@ -54,24 +54,7 @@
           <cTool>
             <incDir>
               <pElem>.</pElem>
-              <pElem>/usr/include/upnp</pElem>
-              <pElem>/usr/local/include</pElem>
-              <pElem>/usr/include/x86_64-linux-gnu</pElem>
             </incDir>
-            <preprocessorList>
-              <Elem>HAVE_DEBUG</Elem>
-              <Elem>HAVE_DLNA</Elem>
-              <Elem>HAVE_ICONV</Elem>
-              <Elem>HAVE_IFADDRS_H</Elem>
-              <Elem>HAVE_LANGINFO_CODESET</Elem>
-              <Elem>HAVE_LANGINFO_H</Elem>
-              <Elem>HAVE_LOCALE_H</Elem>
-              <Elem>HAVE_SETLOCALE</Elem>
-              <Elem>_FILE_OFFSET_BITS=64</Elem>
-              <Elem>_GNU_SOURCE</Elem>
-              <Elem>_LARGEFILE_SOURCE</Elem>
-              <Elem>_REENTRANT</Elem>
-            </preprocessorList>
           </cTool>
         </makeTool>
         <preBuild>
@@ -82,6 +65,29 @@
       <item path="src/buffer.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/cds.c" ex="false" tool="0" flavor2="0">
+        <cTool>
+          <incDir>
+            <pElem>../libupnp/upnp/inc</pElem>
+            <pElem>/usr/local/include</pElem>
+            <pElem>/usr/include/x86_64-linux-gnu</pElem>
+            <pElem>/usr/include/glib-2.0</pElem>
+            <pElem>/usr/lib/x86_64-linux-gnu/glib-2.0/include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>HAVE_DEBUG</Elem>
+            <Elem>HAVE_DLNA</Elem>
+            <Elem>HAVE_ICONV</Elem>
+            <Elem>HAVE_IFADDRS_H</Elem>
+            <Elem>HAVE_LANGINFO_CODESET</Elem>
+            <Elem>HAVE_LANGINFO_H</Elem>
+            <Elem>HAVE_LOCALE_H</Elem>
+            <Elem>HAVE_SETLOCALE</Elem>
+            <Elem>_FILE_OFFSET_BITS=64</Elem>
+            <Elem>_GNU_SOURCE</Elem>
+            <Elem>_LARGEFILE_SOURCE</Elem>
+            <Elem>_REENTRANT</Elem>
+          </preprocessorList>
+        </cTool>
       </item>
       <item path="src/cfgparser.c" ex="false" tool="0" flavor2="0">
       </item>

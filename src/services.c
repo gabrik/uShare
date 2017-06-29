@@ -61,8 +61,7 @@ static struct service_t services[] = {
 
 bool find_service_action (struct Upnp_Action_Request *request,
                      struct service_t **service,
-                     struct service_action_t **action)
-{
+                     struct service_action_t **action){
   int c, d;
 
   *service = NULL;

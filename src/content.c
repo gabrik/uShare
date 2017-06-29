@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "content.h"
+#include "ushare.h"
 
 content_list *content_add(content_list *list, const char *item)
 {
@@ -42,6 +43,22 @@ content_list *content_add(content_list *list, const char *item)
       exit (2);
     }
     list->content[list->count-1] = strdup (item);
+    
+    
+    
+    if(isLiveMedia(item)){
+        live_objects_t*  obj=calloc(1,sizeof(live_transcoding_t));
+        obj->id = -1;
+        obj->src=strdup(item);
+        obj->c_id=list->count-1;
+    
+    
+        stream_map = g_slist_append(stream_map,(gpointer) obj );
+        printf("List size is now: %o\n",g_slist_length (stream_map));    
+        printf("\nAdded a live content from PA-> C_ID:%d SRC: %s\n",obj->c_id,obj->src);
+    }
+    
+        
   }
   return list;
 }

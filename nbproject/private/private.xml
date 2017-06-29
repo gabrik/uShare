@@ -7,12 +7,17 @@
         <activeConfTypeElem>0</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="5">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="8">
         <file>
-            <url>src/http.c</url>
-            <bookmark id="5">
+            <url>src/metadata.c</url>
+            <bookmark id="6">
                 <name/>
-                <line>499</line>
+                <line>246</line>
+                <key/>
+            </bookmark>
+            <bookmark id="7">
+                <name/>
+                <line>501</line>
                 <key/>
             </bookmark>
         </file>
@@ -33,20 +38,35 @@
                 <line>273</line>
                 <key/>
             </bookmark>
+            <bookmark id="8">
+                <name/>
+                <line>304</line>
+                <key/>
+            </bookmark>
             <bookmark id="1">
                 <name/>
-                <line>447</line>
+                <line>457</line>
+                <key/>
+            </bookmark>
+        </file>
+        <file>
+            <url>src/http.c</url>
+            <bookmark id="5">
+                <name/>
+                <line>499</line>
                 <key/>
             </bookmark>
         </file>
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/metadata.c</file>
             <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/ushare.c</file>
             <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/rest_callback.h</file>
-            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/ushare.h</file>
             <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/live.h</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/ushare.h</file>
             <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/http.c</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/cds.c</file>
             <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/content.c</file>
         </group>
     </open-files>
