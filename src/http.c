@@ -428,12 +428,22 @@ static UpnpWebFileHandle get_file_memory(const char *fullpath, const char *descr
     return ((UpnpWebFileHandle) file);
 }
 
-static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode mode) {
+static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode mode,const struct sockaddr_storage* foreign_sockaddr) {
     extern struct ushare_t *ut;
     struct upnp_entry_t *entry = NULL;
     struct web_file_t *file;
     int fd, upnp_id = 0;
 
+    
+    
+    struct sockaddr *s = (struct sockaddr*)foreign_sockaddr;
+    struct sockaddr_in *sin = (struct sockaddr_in *) s;
+    char *ip;
+    ip = inet_ntoa(sin->sin_addr);
+    printf("\x1B[32m" "IP IS %s\n" "\x1B[0m",inet_ntoa(sin->sin_addr));
+    
+    
+    
     transcode_args* th_args = (transcode_args*) calloc(1, sizeof (transcode_args));
 
     if (!filename)
