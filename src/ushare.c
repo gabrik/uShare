@@ -797,12 +797,8 @@ int main(int argc, char **argv) {
     }
 
     // inizializzo live objects
-    live_objects = NULL;
-    stream_map=NULL;
     
-    live_number=(size_t)0;
-    stream_number=(size_t)0;
-    
+
 
     
     
@@ -816,7 +812,7 @@ int main(int argc, char **argv) {
     }
     ulfius_add_endpoint_by_val(&server_inst,"GET","test",NULL,NULL,NULL,NULL,&callback_test,NULL);
     ulfius_add_endpoint_by_val(&server_inst,"POST","add","/source/",NULL,NULL,NULL,&callback_add_live_media,NULL);
-    ulfius_add_endpoint_by_val(&server_inst,"POST","remove","/content/",NULL,NULL,NULL,&callback_rescanning,NULL);
+    ulfius_add_endpoint_by_val(&server_inst,"POST","remove","/content/",NULL,NULL,NULL,&callback_remove,NULL);
     
     /*url_format:        string used to define the endpoint format
      *                    separate words with /
@@ -875,7 +871,12 @@ int main(int argc, char **argv) {
     
     pthread_t pa_th;
     if(pthread_create(&pa_th, NULL, register_to_pa,NULL)) {
-    perror("Error creating thread\n");
+        perror("Error creating thread\n");
+    }
+    
+    pthread_t monitoring_th;
+    if(pthread_create(&monitoring_th, NULL, t_monitoring_pipe,NULL)) {
+        perror("Error creating thread\n");
     }
     
  
@@ -929,14 +930,55 @@ void add_source_pa(char* id){
 }
    
 
-void clear_obj(int id){
+void clear_obj(int c_id,int id){
     
-    printf("Clear Content %d",id);
-    ut->contentlist=content_del(ut->contentlist,id);
+        live_transcoding_t obj; // = calloc(1,sizeof(live_transcoding_t));
+        
+        obj.id = id;
+
+        
+        /*for(iterator=live_streams_list;iterator;iterator=iterator->next){
+            live_transcoding_t* f = (live_transcoding_t *) iterator->data;
+            printf("Current item id is %d\n",f->id);
+        }*/
+        
+        GSList* gs =g_slist_find_custom (live_streams_list, (gconstpointer) &obj,(GCompareFunc)g_cmpfunc);
+        
+        while(gs){
+            live_transcoding_t* f=(live_transcoding_t*) gs->data;
+        
+            //live_transcoding_t* f = (live_transcoding_t*) bsearch((void*) &obj, (void *) live_objects, live_number, sizeof (live_transcoding_t), cmpfunc);
+        
+            if(f){
+                if(f->fp)
+                    pclose(f->fp);
+                f->fp=NULL;
+                live_streams_list=g_slist_remove (live_streams_list, (gconstpointer) f);
+                printf("New list size is %o\n",g_slist_length (live_streams_list));
+            }
+            gs =g_slist_find_custom (live_streams_list, (gconstpointer) &obj,(GCompareFunc)g_cmpfunc);
+        }
+        
+  
+    
+        
+    
+    
+    printf("Clear Content %d",c_id);
+    ut->contentlist=content_del(ut->contentlist,c_id);
     free_metadata_list(ut);
     build_metadata_list(ut);
     
     
+}
+
+
+char* get_pa_media_uri(char* id){
+    char *base_url="http://%s:%d/%s";
+    char *url = (char*) calloc(256,sizeof(char));
+    sprintf(url, base_url, personal_acquirer_address,PA_HTTP_PORT,id);
+    printf("URL is %s\n",url);  
+    return url;
 }
 
 
@@ -949,14 +991,7 @@ void add_from_pa(char* id){
     ut->contentlist = content_add(ut->contentlist,url);
     
     
-    //lista dei file live accesi
-    live_objects_t obj; //=calloc(1,sizeof(live_transcoding_t));
-    obj.id = ut->contentlist->count;
-    obj.src=strdupa(id);
-
-    stream_map = (live_objects_t*) realloc(stream_map, (stream_number + 1) * sizeof (live_objects_t));
-    stream_map[stream_number] = obj;
-    stream_number++;
+    
     
     
     
@@ -964,24 +999,27 @@ void add_from_pa(char* id){
     build_metadata_list(ut);
     
 }
-
+gint g_cmpfunc(gpointer a,gpointer b){
+    live_transcoding_t* one = (live_transcoding_t*)a;
+    live_transcoding_t* two = (live_transcoding_t*)b;
+    printf("%d\n",one->id - two->id);
+    return ( one->id - two->id );
+}
 int cmpfunc(const void *a, const void *b)
 {
     live_transcoding_t* one = (live_transcoding_t*)a;
     live_transcoding_t* two = (live_transcoding_t*)b;
-    /*if(one->id == two->id)
-        return one;
-    */
+    
    return ( one->id - two->id );
 }
+
+
 
 int cmpfunc_streams(const void *a, const void *b)
 {
     live_objects_t* one = (live_objects_t*)a;
     live_objects_t* two = (live_transcoding_t*)b;
-    /*if(one->id == two->id)
-        return one;
-    */
+    
    return ( strcmp(one->src,two->src) );
 }
 
@@ -1050,7 +1088,54 @@ void* connect_to_pa(void* args){
 
 void* t_add_from_pa(void* args){
     
-    char *src=(char*) args;
-    printf("Adding %s from PA",src);
+    char* src=(char*) args;
+    printf("Adding %s from PA \n",src);
     add_from_pa(src);
+}
+
+
+void* t_monitoring_pipe(void* args ){
+    GSList* iterator = NULL;
+    time_t now;
+    while(1){
+        sleep(10);
+        
+        now=time(NULL);
+        
+        for(iterator=live_streams_list;iterator;iterator=iterator->next){
+            live_transcoding_t* f = (live_transcoding_t *) iterator->data;
+            printf("Current item id is %p\n",f->fp);
+            printf("Current time is %ld last read is %ld, difference is %ld\n",now,f->last_read,now-f->last_read);
+            if(f->last_read!=0 && (now-f->last_read)>20){
+                printf("Closing id %p\n",f->fp);
+                if(f->fp)
+                    pclose(f->fp);
+                live_streams_list=g_slist_remove (live_streams_list, (gconstpointer) f);
+                printf("New list size is %o\n",g_slist_length (live_streams_list));
+                
+            }
+            else if (f->last_read==0)
+            {
+                f->startup++;
+                if(f->startup>=4) {
+                    printf("Closing id %p\n",f->fp);
+                        if(f->fp)
+                            pclose(f->fp);
+                    live_streams_list=g_slist_remove (live_streams_list, (gconstpointer) f);
+                    printf("New list size is %o\n",g_slist_length (live_streams_list));
+                    }
+            }
+           
+            
+        }
+    }
+    
+}
+
+
+gint g_cmpfunc_stream(gpointer a, gpointer b){
+    live_objects_t* one = (live_objects_t*)a;
+    live_objects_t* two = (live_transcoding_t*)b;
+    
+   return ( strcmp(one->src,two->src) );
 }
