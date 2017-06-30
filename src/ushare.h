@@ -178,6 +178,7 @@ typedef struct live_transcoding{
     time_t last_read;
     int startup;
     transcode_args live;
+    char* inet_address_client;
     
 } live_transcoding_t;
 
@@ -185,6 +186,7 @@ typedef struct {
     int id;
     char *src;
     int c_id;
+    
 } live_objects_t;
 
 
@@ -199,7 +201,7 @@ size_t live_number;
 int cmpfunc(const void *a, const void *b);
 int cmpfunc_streams(const void*,const void*);
 gint g_cmpfunc(gpointer,gpointer);
-
+gint g_cmpfunc_ip(gpointer,gpointer);
 gint g_cmpfunc_stream(gpointer, gpointer);
 
 

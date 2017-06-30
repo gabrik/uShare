@@ -1002,9 +1002,23 @@ void add_from_pa(char* id){
 gint g_cmpfunc(gpointer a,gpointer b){
     live_transcoding_t* one = (live_transcoding_t*)a;
     live_transcoding_t* two = (live_transcoding_t*)b;
-    printf("%d\n",one->id - two->id);
+    
     return ( one->id - two->id );
 }
+
+
+gint g_cmpfunc_ip(gpointer a,gpointer b){
+    int id_comparison=g_cmpfunc(a,b);
+    if (id_comparison==0){
+        live_transcoding_t* one = (live_transcoding_t*)a;
+        live_transcoding_t* two = (live_transcoding_t*)b;
+        return strcmp(one->inet_address_client,two->inet_address_client);
+    }
+    return id_comparison;
+}
+
+
+
 int cmpfunc(const void *a, const void *b)
 {
     live_transcoding_t* one = (live_transcoding_t*)a;

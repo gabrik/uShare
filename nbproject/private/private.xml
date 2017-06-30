@@ -12,7 +12,7 @@
             <url>src/http.c</url>
             <bookmark id="5">
                 <name/>
-                <line>499</line>
+                <line>509</line>
                 <key/>
             </bookmark>
         </file>
@@ -60,10 +60,8 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/ushare.c</file>
-            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/config.mak</file>
-            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/configure</file>
-            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/conf.bash</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/http.h</file>
+            <file>file:/home/gabriele/Documenti/Workspace/C/uShare/src/http.c</file>
         </group>
     </open-files>
 </project-private>
