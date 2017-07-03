@@ -47,6 +47,7 @@
         <in>util_iconv.h</in>
       </df>
       <in>config.h</in>
+      <in>start.sh</in>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
@@ -85,8 +86,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v </runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 127.0.0.1</runcommandpicklistitem>
@@ -95,8 +94,10 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 172.16.0.12</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 172.16.0.28</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 172.16.0.8</runcommandpicklistitem>
+          <runcommandpicklistitem>start.sh 172.16.0.8</runcommandpicklistitem>
+          <runcommandpicklistitem>./start.sh 172.16.0.8</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 172.16.0.8</runcommand>
+        <runcommand>./start.sh 172.16.0.8</runcommand>
         <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>

@@ -21,6 +21,7 @@
         <in>ushare.c</in>
         <in>util_iconv.c</in>
       </df>
+      <in>start.sh</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -113,6 +114,8 @@
       <item path="src/ushare.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/util_iconv.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="start.sh" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
