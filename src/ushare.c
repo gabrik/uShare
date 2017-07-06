@@ -317,6 +317,8 @@ static int init_upnp(struct ushare_t *ut) {
                 "/web/cds_event");
         if (!description)
             return -1;
+        
+        //printf(description);
     } else {
 #endif /* HAVE_DLNA */ 
         len = strlen(UPNP_DESCRIPTION) + strlen(ut->name)
@@ -324,6 +326,9 @@ static int init_upnp(struct ushare_t *ut) {
         description = (char *) malloc(len * sizeof (char));
         memset(description, 0, len);
         sprintf(description, UPNP_DESCRIPTION, ut->name, ut->model_name, ut->udn);
+        
+        
+        
 #ifdef HAVE_DLNA
     }
 #endif /* HAVE_DLNA */

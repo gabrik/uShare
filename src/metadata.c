@@ -502,7 +502,7 @@ metadata_add_container(struct ushare_t *ut,
 
     if (isLiveMedia(container))  {
         printf("%s is a live media\n",container);
-        metadata_add_live(ut,entry,container,"live");  //TODO VEDERE DI SISTEMARE 
+        metadata_add_live(ut,entry,container,entry->title);  //TODO VEDERE DI SISTEMARE 
         //struct stat st_live;
        
         /*if (stat(container, &st_live) < 0) {

@@ -179,11 +179,14 @@ extern "C" {
 
                 char *name = strndup(id, strlen(id));
 
+                
+                 printf("Adding %s from PA \n",name);
+                   add_from_pa(name);
 
-                pthread_t pa_th;
+                /*pthread_t pa_th;
                 if (pthread_create(&pa_th, NULL, t_add_from_pa, (void*) name)) {
                     perror("Error creating thread\n");
-                }
+                }*/
 
 
 

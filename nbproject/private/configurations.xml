@@ -47,7 +47,6 @@
         <in>util_iconv.h</in>
       </df>
       <in>config.h</in>
-      <in>start.sh</in>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>

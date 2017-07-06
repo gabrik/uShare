@@ -58,7 +58,7 @@
 
 #define UPNP_DESCRIPTION \
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>" \
-"<root xmlns=\"urn:schemas-upnp-org:device-1-0\">" \
+"<root xmlns=\"urn:schemas-upnp-org:device-1-0\" >" \
 "  <specVersion>" \
 "    <major>1</major>" \
 "    <minor>0</minor>" \
