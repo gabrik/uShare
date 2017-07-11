@@ -85,7 +85,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 127.0.0.1</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i wlan0 -a 127.0.0.1</runcommandpicklistitem>
@@ -95,8 +94,9 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 172.16.0.8</runcommandpicklistitem>
           <runcommandpicklistitem>start.sh 172.16.0.8</runcommandpicklistitem>
           <runcommandpicklistitem>./start.sh 172.16.0.8</runcommandpicklistitem>
+          <runcommandpicklistitem>./start.sh 172.16.0.113</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>./start.sh 172.16.0.8</runcommand>
+        <runcommand>./start.sh 172.16.0.113</runcommand>
         <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>

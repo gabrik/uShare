@@ -184,6 +184,9 @@ static void ushare_signal_exit(void) {
     ulfius_stop_framework(&server_inst);
     ulfius_clean_instance(&server_inst);
     
+    
+    //TODO close all ffmpeg pipe
+    
     printf("Server is shutting down: other clients will be notified soon, Bye bye ...\n");
     
     ushare_free(&ut);
@@ -1125,14 +1128,26 @@ void* t_monitoring_pipe(void* args ){
             live_transcoding_t* f = (live_transcoding_t *) iterator->data;
             printf("Current item id is %p\n",f->fp);
             printf("Current time is %ld last read is %ld, difference is %ld\n",now,f->last_read,now-f->last_read);
-            if(f->last_read!=0 && (now-f->last_read)>20){
-                printf("Closing id %p\n",f->fp);
+            if(f->last_read!=0 && (now-f->last_read)>=20){
+                printf("\033[1m"  "\x1B[31m" "Closing id %p\n" "\x1B[0m" "\033[22m",f->fp); //printf("\x1B[32m" "CLIENT IP IS %s\n" "\x1B[0m", ip);
                 if(f->fp)
                     pclose(f->fp);
                 live_streams_list=g_slist_remove (live_streams_list, (gconstpointer) f);
                 printf("New list size is %o\n",g_slist_length (live_streams_list));
                 
+            }else{
+                if(f->last_read==0){
+                    f->startup++;
+                    if(f->startup>=4){
+                        printf("Closing id %p\n",f->fp);
+                        if(f->fp) 
+                            pclose(f->fp);
+                        live_streams_list=g_slist_remove (live_streams_list, (gconstpointer) f);
+                        printf("New list size is %o\n",g_slist_length (live_streams_list));
+                    }
+                }
             }
+            
             /*else if (f->last_read==0)
             {
                 f->startup++;

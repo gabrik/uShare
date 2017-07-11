@@ -321,7 +321,7 @@ static UpnpWebFileHandle http_open(const char *filename, enum UpnpOpenFileMode m
             //char *base="ffmpeg -hide_banner -threads auto -acodec mp3 -vcodec h264 -f mpegts -i %s -y -threads auto -c:v mpeg2video -pix_fmt yuv420p -qscale:v 1 -r 24000/1001 -g 15 -c:a ac3 -b:a 384k -ac 2 -map 0:1 -map 0:0 -b 100k -sn -f vob pipe:";
             //char *base="nice -n -20 ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -y -acodec copy -vcodec copy -f mpegts pipe:";
 
-            char *base = "ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -preset ultrafast -y -acodec copy -vcodec copy -f mpegts pipe:";
+            char *base = "ffmpeg -re -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -preset ultrafast -y -acodec copy -vcodec copy -f mpegts pipe:";
             //char *base = "ffmpeg -hide_banner -acodec mp3 -vcodec h264 -f mpegts -i %s -y -acodec copy -vcodec copy -segment_time 4 -f segment test.mp4";
 
             char *cmd = calloc(strlen(base) + strlen(entry->fullpath), sizeof (char));
