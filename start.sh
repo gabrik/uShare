@@ -10,5 +10,5 @@
 
 mount Recorded
 echo "Personal is at $1"
-./src/ushare -c ./Recorded -v -d -i ens3 -a $1
+./src/ushare -c /home/ubuntu/Recorded -v -d -i ens3 -a $1
 umount Recorded

@@ -1133,7 +1133,7 @@ void* t_monitoring_pipe(void* args ){
                 printf("New list size is %o\n",g_slist_length (live_streams_list));
                 
             }
-            else if (f->last_read==0)
+            /*else if (f->last_read==0)
             {
                 f->startup++;
                 if(f->startup>=4) {
@@ -1143,7 +1143,8 @@ void* t_monitoring_pipe(void* args ){
                     live_streams_list=g_slist_remove (live_streams_list, (gconstpointer) f);
                     printf("New list size is %o\n",g_slist_length (live_streams_list));
                     }
-            }
+            }*/
+             
            
             
         }
