@@ -8,7 +8,7 @@
 
 #"${OUTPUT_PATH}"  -c /home/gabriele/Video -v -d -i eth0 -a 172.16.0.8
 
-mount Recorded
+#mount /home/gabriele/Recorded
 echo "Personal is at $1"
-./src/ushare -c /home/ubuntu/Recorded -v -d -i ens3 -a $1
-umount Recorded
+./src/ushare -c /home/gabriele/Video/Recorded -v -d -i eth0 -a $1
+#umount /home/gabriele/Recorded
