@@ -1,0 +1,9 @@
+[submodule "libupnp"]
+	path = libupnp
+	url = https://github.com/gabrik/libupnp
+[submodule "libdlna"]
+	path = libdlna
+	url = https://github.com/gabrik/libdlna
+[submodule "ulfius"]
+	path = ulfius
+	url = https://github.com/gabrik/ulfius
